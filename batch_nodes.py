@@ -393,11 +393,14 @@ class BatchMiniMaxLoader:
         if audio is None:
             audio = {"waveform": torch.zeros(1, 1, 1), "sample_rate": 44100}
 
+        # Actual duration of the source video in seconds (informs the length node)
+        duration_src = float(total_frames) / fps if fps > 0 else float(images.shape[0]) / 24.0
+
         # Snap the frame count DOWN to the model's 17k+5 grid (24 fps) so MiniMax H3
         # never has to invent extra frames — the output then matches the feed exactly
         # frame-for-frame (smooth motion, clip just a bit shorter). Length = a*24 rounded
         # down to the nearest 17k+5 grid point (drift 0..16 frames, acceptable).
-        base = max(5, round(duration * 24))
+        base = max(5, round(duration_src * 24))
         length_frames = base - ((base - 5) % 17)
 
         # Trim the source frames to that many reference frames (1:1 with generation).
