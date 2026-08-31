@@ -159,9 +159,18 @@ Matching logic: a video stem `01` claims every image whose stem starts with `01-
 
 ### Prompts
 
-The bundled workflow keeps the four prompt blocks (motion from `<Video 1>`, outfit from `<Picture 1>`, background from `<Picture 2>`). The `prompt` output of the loader is **not** wired into the model in this build — the original `StringConcatenate` chain stays and continues to feed `MiniMaxH3ReferenceToVideo:prompt`. To override the whole prompt for a video, drop a same-named `.txt` next to it.
+The bundled workflow keeps the four prompt blocks (motion from `<Video 1>`, outfit from `<Picture 1>`, background from `<Picture 2>`). They build the **fallback** prompt.
 
-> **Note:** the reference-tag syntax (`<Picture 1>` / `<Picture 2>` / `<Video 1>`) is preserved because the existing prompt-chain is untouched. Per-video `.txt` files must respect the same syntax.
+There is an automatic **prompt switch** in the loader:
+
+- The static prompt-chain's final output (`StringConcatenate`) feeds the loader's `fallback_prompt` input.
+- The loader's `prompt` output is wired into `MiniMaxH3ReferenceToVideo:prompt`.
+- **If a `01.txt` (or `.prompt`) sits next to the video → its text is used for every run of that video (overrides the chain).**
+- **If there is no `.txt` → the prompt-chain text is used** (from `fallback_prompt`).
+
+So the workflow blocks stay as the default prompt for clips without a `.txt` file, and a per-video `.txt` replaces them entirely when present.
+
+> **Note:** the reference-tag syntax (`<Picture 1>` / `<Picture 2>` / `<Video 1>`) is used by the prompt-chain; per-video `.txt` files must respect the same syntax.
 
 ## Parameters
 
