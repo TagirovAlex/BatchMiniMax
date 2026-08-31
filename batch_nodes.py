@@ -393,6 +393,22 @@ class BatchMiniMaxLoader:
         if audio is None:
             audio = {"waveform": torch.zeros(1, 1, 1), "sample_rate": 44100}
 
+        # Snap the frame count DOWN to the model's 17k+5 grid (24 fps) so MiniMax H3
+        # never has to invent extra frames — the output then matches the feed exactly
+        # frame-for-frame (smooth motion, clip just a bit shorter). Length = a*24 rounded
+        # down to the nearest 17k+5 grid point (drift 0..16 frames, acceptable).
+        base = max(5, round(duration * 24))
+        length_frames = base - ((base - 5) % 17)
+
+        # Trim the source frames to that many reference frames (1:1 with generation).
+        if images.shape[0] > length_frames:
+            images = images[:length_frames]
+        actual = images.shape[0]
+
+        # Feed the length node a value a such that round(a*24) == the trimmed count,
+        # so the generated length matches the frames we actually passed in.
+        duration = float(actual) / 24.0
+
         # Load the single reference image for this task
         ref_image = _load_image_tensor(task["image"]) if task["image"] else None
 
