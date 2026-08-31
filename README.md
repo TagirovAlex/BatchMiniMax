@@ -35,7 +35,7 @@ Custom nodes for [ComfyUI](https://github.com/comfyanonymous/ComfyUI) that add b
 - **Один промпт на весь ролик.** Если рядом лежит `01.txt` — его текст применяется ко **всем** прогонам `01-1`, `01-2`, `01-3`. Если файла нет — используется стандартный промпт workflow.
 - **Не ломается без картинок.** Если у ролика нет ни одной картинки — он просто прогонится один раз без референса (без ошибок).
 - **Автоматически ставит следующее задание в очередь**, когда текущее сохранено.
-- **Поддерживает ролики разной длины.** Длительность каждого ролика автоматически подставляется в узел расчёта длины (как при ручном указании): ролик 9 с даст ~9.4 с (округляется до сетки кадров 17k+5).
+- **Поддерживает ролики разной длины.** Длительность каждого ролика автоматически подставляется в узел расчёта длины (как при ручном указании): ролик 9 с даст ~8.7 с — длина **округляется вниз** до сетки кадров 17k+5, без добавления лишних кадров (это сохраняет плавность, узел MiniMax не «додумывает» движения).
 
 ### Конвенция имён файлов
 
@@ -193,7 +193,7 @@ So the workflow blocks stay as the default prompt for clips without a `.txt` fil
 
 1. `BatchMiniMaxLoader` scans the folder, sorts videos, pairs each video with its reference images (`01-` prefix), and flattens them into tasks **video-by-video**: all images of the first video, then all of the second, etc.
 2. It loads the video for the current `task_index`, plus the **single** reference image for that task (None if the video has no images).
-3. Output `filename` gives the save stem for this task (`01-2`), which feeds `VHS_VideoCombine:filename_prefix`. Output `duration` (in seconds) feeds the length-computation node (`ComfyMathExpression`), so the video's `length` is derived from each clip's real duration instead of a fixed value — clips of different lengths are handled automatically (the length is snapped to the model's 17k+5 frame grid, exactly like the manual calculation).
+3. Output `filename` gives the save stem for this task (`01-2`), which feeds `VHS_VideoCombine:filename_prefix`. Output `duration` (in seconds) feeds the length-computation node (`ComfyMathExpression`), so the video's `length` is derived from each clip's real duration instead of a fixed value — clips of different lengths are handled automatically. The frame count is **snapped down** to the model's 17k+5 grid (24 fps) so MiniMax H3 never has to invent extra frames — this keeps the motion smooth instead of slightly stretched/jittery (a 9 s clip becomes ~8.7 s / 209 frames).
 4. `MiniMaxH3ReferenceToVideo` already handles `None` images gracefully (`if img is None: continue`).
 5. After the workflow completes and the video is saved, `BatchAutoQueue` increments `task_index` and POSTs the modified prompt to `http://127.0.0.1:8188/prompt`.
 6. ComfyUI picks up the new prompt and processes the next task.
