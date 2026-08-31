@@ -1,0 +1,74 @@
+                   GNU LESSER GENERAL PUBLIC LICENSE
+                       Version 3, 29 June 2007
+
+ Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>
+ Everyone is permitted to copy and distribute verbatim copies
+ of this license document, but changing it is not allowed.
+
+  This version of the GNU Lesser General Public License incorporates
+the terms and conditions of version 3 of the GNU General Public
+License, supplemented by the additional permissions listed below.
+
+  0. Additional Definitions.
+
+  As used herein, "this License" refers to version 3 of the GNU Lesser
+General Public License, and the "GNU GPL" refers to version 3 of the GNU
+General Public License.
+
+  "The Library" refers to a work produced by the GNU Lesser General
+Public License entity or a work based on it.
+
+  "Library" also means a work distributed under the GNU General Public
+License that is not covered by the GNU Lesser General Public License.
+
+  "Modified Version" of a work means any work containing the Library or
+a portion of it, either copied verbatim, or with modifications.
+
+  "Application" means any work that makes use of an interface provided
+by the Library, but which is not otherwise based on the Library.
+Defining a subclass of a class defined by the Library is deemed a mode
+of using an interface provided by the Library.
+
+  "Combined Library" means a combination of the Library with other work,
+not forming a larger work based on the Library, in which the Library is
+not linked.
+
+  The Corresponding Source for a Combined Library must include the
+source code for any parts of the Library that are combined with it.
+
+  1. Exception to Section 3 of the GNU GPL.
+
+  You may convey a covered work under sections 3 and 4 of this License
+without being bound by section 3 of the GNU GPL.
+
+  2. Conveying Modified Versions.
+
+  If you modify a copy of the Library, and extend its interface to make
+it usable by an application, you must convey the source code of the
+modified version under the terms of this License.
+
+  3. Incorporating the Library into a larger work.
+
+  You may convey a work based on the Library, combined with other work,
+provided that you also convey the source code of the Library, and comply
+with the terms of this License for the combined work.
+
+  4. Combined Libraries.
+
+  You may convey a Combined Library under the terms of this License,
+and attach a copy of this License to it, provided that you also convey
+the Corresponding Source for the Library.
+
+  5. Application Libraries.
+
+  You may convey a work that uses the Library, and modify the Library
+to make it usable by the application, provided that you also convey the
+source code of the modified Library.
+
+  6. Revised Versions.
+
+  The Free Software Foundation may publish revised and/or new versions
+of the GNU Lesser General Public License from time to time.
+
+  FULL LICENSE TEXT:
+  https://www.gnu.org/licenses/lgpl-3.0.txt
