@@ -532,86 +532,6 @@
       "bgcolor": "#533"
     },
     {
-      "id": 5,
-      "type": "LoraLoaderModelOnly",
-      "pos": [
-        -3225.1815137177714,
-        159.16190534587827
-      ],
-      "size": [
-        642.1860782864495,
-        82
-      ],
-      "flags": {},
-      "order": 7,
-      "mode": 0,
-      "inputs": [
-        {
-          "localized_name": "модель",
-          "name": "model",
-          "type": "MODEL",
-          "link": 41
-        },
-        {
-          "localized_name": "название_lora",
-          "name": "lora_name",
-          "type": "COMBO",
-          "widget": {
-            "name": "lora_name"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "сила_модели",
-          "name": "strength_model",
-          "type": "FLOAT",
-          "widget": {
-            "name": "strength_model"
-          },
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "localized_name": "МОДЕЛЬ",
-          "name": "MODEL",
-          "type": "MODEL",
-          "links": [
-            2,
-            4
-          ]
-        }
-      ],
-      "title": "Turbo LoRA (ВЫКЛ по умолчанию — ПКМ > Mode > Bypass чтобы включить/выключить)",
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.33.3",
-        "Node name for S&R": "LoraLoaderModelOnly",
-        "models": [
-          {
-            "name": "minimax_h3_ref2v_turbo_4step_v0.1_comfyui_bf16.safetensors",
-            "url": "https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/loras/minimax_h3_ref2v_turbo_4step_v0.1_comfyui_bf16.safetensors",
-            "directory": "loras"
-          }
-        ],
-        "ue_properties": {
-          "widget_ue_connectable": {},
-          "version": "7.8",
-          "input_ue_unconnectable": {}
-        }
-      },
-      "widgets_values": [
-        "minimax_h3_ref2v_lightx2v_turbo_4step_v0.1_resized_avg_rank_20_bf16.safetensors",
-        1
-      ],
-      "widgets_values_named": {
-        "lora_name": "minimax_h3_ref2v_lightx2v_turbo_4step_v0.1_resized_avg_rank_20_bf16.safetensors",
-        "strength_model": 1
-      },
-      "color": "#322",
-      "bgcolor": "#533"
-    },
-    {
       "id": 35,
       "type": "PathchSageAttentionKJ",
       "pos": [
@@ -623,7 +543,7 @@
         82
       ],
       "flags": {},
-      "order": 8,
+      "order": 7,
       "mode": 0,
       "inputs": [
         {
@@ -695,7 +615,7 @@
         170
       ],
       "flags": {},
-      "order": 9,
+      "order": 8,
       "mode": 0,
       "inputs": [
         {
@@ -778,7 +698,7 @@
       "flags": {
         "collapsed": false
       },
-      "order": 10,
+      "order": 9,
       "mode": 0,
       "inputs": [
         {
@@ -837,7 +757,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 11,
+      "order": 10,
       "mode": 0,
       "inputs": [
         {
@@ -898,7 +818,7 @@
         }
       },
       "widgets_values": [
-        "max(5, round(a * 24)) + (5 - (max(5, round(a * 24)) % 17)) % 17"
+        "max(5, round(a * 24)) - ((max(5, round(a * 24)) - 5) % 17)"
       ],
       "widgets_values_named": {
         "expression": "max(5, round(a * 24)) + (5 - (max(5, round(a * 24)) % 17)) % 17"
@@ -916,7 +836,7 @@
         60
       ],
       "flags": {},
-      "order": 12,
+      "order": 11,
       "mode": 0,
       "inputs": [
         {
@@ -967,7 +887,7 @@
         63.71213949066669
       ],
       "flags": {},
-      "order": 13,
+      "order": 12,
       "mode": 0,
       "inputs": [
         {
@@ -1021,7 +941,7 @@
         106
       ],
       "flags": {},
-      "order": 14,
+      "order": 13,
       "mode": 0,
       "inputs": [
         {
@@ -1105,7 +1025,7 @@
         87.48485579626674
       ],
       "flags": {},
-      "order": 15,
+      "order": 14,
       "mode": 0,
       "inputs": [
         {
@@ -1161,7 +1081,7 @@
         560
       ],
       "flags": {},
-      "order": 16,
+      "order": 15,
       "mode": 0,
       "inputs": [
         {
@@ -1346,7 +1266,7 @@
         329.2886091546833
       ],
       "flags": {},
-      "order": 17,
+      "order": 16,
       "mode": 0,
       "inputs": [
         {
@@ -1420,7 +1340,7 @@
         60
       ],
       "flags": {},
-      "order": 18,
+      "order": 17,
       "mode": 0,
       "inputs": [
         {
@@ -1471,7 +1391,7 @@
       "flags": {
         "collapsed": false
       },
-      "order": 19,
+      "order": 18,
       "mode": 0,
       "inputs": [
         {
@@ -1528,7 +1448,7 @@
         82
       ],
       "flags": {},
-      "order": 20,
+      "order": 19,
       "mode": 0,
       "inputs": [
         {
@@ -1585,7 +1505,7 @@
         302.45508394893704
       ],
       "flags": {},
-      "order": 21,
+      "order": 20,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -1625,7 +1545,7 @@
         360.4332448651735
       ],
       "flags": {},
-      "order": 22,
+      "order": 21,
       "mode": 4,
       "inputs": [
         {
@@ -1697,7 +1617,7 @@
         275.5361288915951
       ],
       "flags": {},
-      "order": 23,
+      "order": 22,
       "mode": 0,
       "inputs": [
         {
@@ -1752,7 +1672,7 @@
         264.5346892420107
       ],
       "flags": {},
-      "order": 24,
+      "order": 23,
       "mode": 0,
       "inputs": [
         {
@@ -1787,10 +1707,10 @@
         }
       },
       "widgets_values": [
-        "Replace the subject's clothing with the outfit shown in <Picture 1>. Keep the fabric behaving naturally with the body's movement. dont change other."
+        "Replace the subject's clothing with the outfit shown in <Picture 1>. Keep the fabric behaving naturally with the body's movement. keep  crotch bare. Don't create cowards. dont change other."
       ],
       "widgets_values_named": {
-        "value": "Replace the subject's clothing with the outfit shown in <Picture 1>. Keep the fabric behaving naturally with the body's movement. dont change other."
+        "value": "Replace the subject's clothing with the outfit shown in <Picture 1>. Keep the fabric behaving naturally with the body's movement. keep  crotch bare. Don't create cowards. dont change other."
       },
       "color": "#432",
       "bgcolor": "#653"
@@ -1807,7 +1727,7 @@
         822.6875
       ],
       "flags": {},
-      "order": 25,
+      "order": 24,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -1840,7 +1760,7 @@
         265.7297760798265
       ],
       "flags": {},
-      "order": 26,
+      "order": 25,
       "mode": 0,
       "inputs": [
         {
@@ -1895,7 +1815,7 @@
         182.74644631018464
       ],
       "flags": {},
-      "order": 27,
+      "order": 26,
       "mode": 4,
       "inputs": [
         {
@@ -1950,7 +1870,7 @@
         756.4107331391108
       ],
       "flags": {},
-      "order": 28,
+      "order": 27,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -1983,7 +1903,7 @@
         173.19373175844652
       ],
       "flags": {},
-      "order": 29,
+      "order": 28,
       "mode": 0,
       "inputs": [
         {
@@ -2091,7 +2011,7 @@
       "flags": {
         "collapsed": false
       },
-      "order": 30,
+      "order": 29,
       "mode": 0,
       "inputs": [
         {
@@ -2247,13 +2167,13 @@
           "hidden": true,
           "paused": true,
           "params": {
-            "filename": "MiniMax_H3_edit_00001-audio.mp4",
+            "filename": "MiniMax_H3_edit_00003-audio.mp4",
             "subfolder": "OF",
             "type": "output",
             "format": "video/h264-mp4",
             "frame_rate": 24,
-            "workflow": "MiniMax_H3_edit_00001.png",
-            "fullpath": "G:\\Generation\\OF\\MiniMax_H3_edit_00001-audio.mp4"
+            "workflow": "MiniMax_H3_edit_00003.png",
+            "fullpath": "G:\\Generation\\OF\\MiniMax_H3_edit_00003-audio.mp4"
           },
           "muted": true
         }
@@ -2273,19 +2193,99 @@
           "hidden": true,
           "paused": true,
           "params": {
-            "filename": "MiniMax_H3_edit_00001-audio.mp4",
+            "filename": "MiniMax_H3_edit_00003-audio.mp4",
             "subfolder": "OF",
             "type": "output",
             "format": "video/h264-mp4",
             "frame_rate": 24,
-            "workflow": "MiniMax_H3_edit_00001.png",
-            "fullpath": "G:\\Generation\\OF\\MiniMax_H3_edit_00001-audio.mp4"
+            "workflow": "MiniMax_H3_edit_00003.png",
+            "fullpath": "G:\\Generation\\OF\\MiniMax_H3_edit_00003-audio.mp4"
           },
           "muted": true
         }
       },
       "color": "#233",
       "bgcolor": "#355"
+    },
+    {
+      "id": 5,
+      "type": "LoraLoaderModelOnly",
+      "pos": [
+        -3225.1815137177678,
+        166.7702165621716
+      ],
+      "size": [
+        642.1860782864495,
+        82
+      ],
+      "flags": {},
+      "order": 30,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "модель",
+          "name": "model",
+          "type": "MODEL",
+          "link": 41
+        },
+        {
+          "localized_name": "название_lora",
+          "name": "lora_name",
+          "type": "COMBO",
+          "widget": {
+            "name": "lora_name"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "сила_модели",
+          "name": "strength_model",
+          "type": "FLOAT",
+          "widget": {
+            "name": "strength_model"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "МОДЕЛЬ",
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            2,
+            4
+          ]
+        }
+      ],
+      "title": "Turbo LoRA (ВЫКЛ по умолчанию — ПКМ > Mode > Bypass чтобы включить/выключить)",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.33.3",
+        "Node name for S&R": "LoraLoaderModelOnly",
+        "models": [
+          {
+            "name": "minimax_h3_ref2v_turbo_4step_v0.1_comfyui_bf16.safetensors",
+            "url": "https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/loras/minimax_h3_ref2v_turbo_4step_v0.1_comfyui_bf16.safetensors",
+            "directory": "loras"
+          }
+        ],
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "version": "7.8",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "minimax_h3_ref2v_lightx2v_turbo_4step_v0.1_resized_avg_rank_20_bf16.safetensors",
+        1
+      ],
+      "widgets_values_named": {
+        "lora_name": "minimax_h3_ref2v_lightx2v_turbo_4step_v0.1_resized_avg_rank_20_bf16.safetensors",
+        "strength_model": 1
+      },
+      "color": "#322",
+      "bgcolor": "#533"
     },
     {
       "id": 200,
@@ -2846,8 +2846,8 @@
     "ds": {
       "scale": 0.6571760615276129,
       "offset": [
-        3077.8631482392966,
-        268.59547296383727
+        2189.2123981762275,
+        568.3629348857954
       ]
     },
     "links_added_by_ue": [],
