@@ -1787,10 +1787,10 @@
         }
       },
       "widgets_values": [
-        "Replace the subject's clothing with the outfit shown in <Picture 1>. Keep the fabric behaving naturally with the body's movement. keep  crotch bare. Don't create cowards. dont change other."
+        "Replace the subject's clothing with the outfit shown in <Picture 1>. Keep the fabric behaving naturally with the body's movement. dont change other."
       ],
       "widgets_values_named": {
-        "value": "Replace the subject's clothing with the outfit shown in <Picture 1>. Keep the fabric behaving naturally with the body's movement. keep  crotch bare. Don't create cowards. dont change other."
+        "value": "Replace the subject's clothing with the outfit shown in <Picture 1>. Keep the fabric behaving naturally with the body's movement. dont change other."
       },
       "color": "#432",
       "bgcolor": "#653"
