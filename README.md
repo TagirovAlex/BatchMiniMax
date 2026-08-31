@@ -1,6 +1,6 @@
 # BatchMiniMax — Batch Processor for MiniMax H3
 
-![GitHub License](https://img.shields.io/github/license/HELPMEEADICE/BatchMiniMax)
+![GitHub License](https://img.shields.io/github/license/TagirovAlex/BatchMiniMax)
 ![GitHub Release](https://img.shields.io/github/v/release/HELPMEEADICE/BatchMiniMax)
 ![ComfyUI](https://img.shields.io/badge/ComfyUI-compatible-brightgreen)
 
@@ -206,4 +206,4 @@ So the workflow blocks stay as the default prompt for clips without a `.txt` fil
 
 ## License
 
-LGPL-3.0
+MIT
