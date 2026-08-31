@@ -1,9 +1,255 @@
 {
-  "id": "minimax-h3-ref2v-clothing-bg-edit-batch",
-  "revision": 1,
-  "last_node_id": 202,
-  "last_link_id": 2007,
+  "id": "minimax-h3-ref2v-clothing-bg-edit",
+  "revision": 0,
+  "last_node_id": 201,
+  "last_link_id": 96,
   "nodes": [
+    {
+      "id": 38,
+      "type": "StringConcatenate",
+      "pos": [
+        -1171.0322086505118,
+        654.5897306484412
+      ],
+      "size": [
+        296.9666809082031,
+        166
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "строка_a",
+          "name": "string_a",
+          "type": "STRING",
+          "widget": {
+            "name": "string_a"
+          },
+          "link": 42
+        },
+        {
+          "localized_name": "строка_b",
+          "name": "string_b",
+          "type": "STRING",
+          "widget": {
+            "name": "string_b"
+          },
+          "link": 43
+        },
+        {
+          "localized_name": "разделитель",
+          "name": "delimiter",
+          "type": "STRING",
+          "widget": {
+            "name": "delimiter"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "СТРОКА",
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            46
+          ]
+        }
+      ],
+      "title": "+ БЛОК 2 (bypass = пропустить одежду)",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.33.3",
+        "Node name for S&R": "StringConcatenate",
+        "ue_properties": {
+          "widget_ue_connectable": {
+            "string_a": true,
+            "string_b": true
+          },
+          "version": "7.8",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "\n",
+        "",
+        ""
+      ],
+      "widgets_values_named": {
+        "string_a": "\n",
+        "string_b": "",
+        "delimiter": ""
+      },
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 40,
+      "type": "StringConcatenate",
+      "pos": [
+        -1761.4526077268254,
+        1019.6422552812313
+      ],
+      "size": [
+        280,
+        166
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 1,
+      "mode": 4,
+      "inputs": [
+        {
+          "localized_name": "строка_a",
+          "name": "string_a",
+          "type": "STRING",
+          "widget": {
+            "name": "string_a"
+          },
+          "link": 44
+        },
+        {
+          "localized_name": "строка_b",
+          "name": "string_b",
+          "type": "STRING",
+          "widget": {
+            "name": "string_b"
+          },
+          "link": 45
+        },
+        {
+          "localized_name": "разделитель",
+          "name": "delimiter",
+          "type": "STRING",
+          "widget": {
+            "name": "delimiter"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "СТРОКА",
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            48
+          ]
+        }
+      ],
+      "title": "+ БЛОК 4 (bypass = пропустить)",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.33.3",
+        "Node name for S&R": "StringConcatenate",
+        "ue_properties": {
+          "widget_ue_connectable": {
+            "string_a": true,
+            "string_b": true
+          },
+          "version": "7.8",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "\n",
+        "",
+        ""
+      ],
+      "widgets_values_named": {
+        "string_a": "\n",
+        "string_b": "",
+        "delimiter": ""
+      },
+      "color": "#333",
+      "bgcolor": "#444"
+    },
+    {
+      "id": 42,
+      "type": "StringConcatenate",
+      "pos": [
+        -560.2655409284872,
+        659.1671103478504
+      ],
+      "size": [
+        280,
+        166
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "строка_a",
+          "name": "string_a",
+          "type": "STRING",
+          "widget": {
+            "name": "string_a"
+          },
+          "link": 46
+        },
+        {
+          "localized_name": "строка_b",
+          "name": "string_b",
+          "type": "STRING",
+          "widget": {
+            "name": "string_b"
+          },
+          "link": 47
+        },
+        {
+          "localized_name": "разделитель",
+          "name": "delimiter",
+          "type": "STRING",
+          "widget": {
+            "name": "delimiter"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "СТРОКА",
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            44
+          ]
+        }
+      ],
+      "title": "+ БЛОК 3 (bypass = пропустить фон)",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.33.3",
+        "Node name for S&R": "StringConcatenate",
+        "ue_properties": {
+          "widget_ue_connectable": {
+            "string_a": true,
+            "string_b": true
+          },
+          "version": "7.8",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "\n",
+        "",
+        ""
+      ],
+      "widgets_values_named": {
+        "string_a": "\n",
+        "string_b": "",
+        "delimiter": ""
+      },
+      "color": "#234",
+      "bgcolor": "#345"
+    },
     {
       "id": 1,
       "type": "UNETLoader",
@@ -16,7 +262,7 @@
         90
       ],
       "flags": {},
-      "order": 0,
+      "order": 3,
       "mode": 0,
       "inputs": [
         {
@@ -88,7 +334,7 @@
         106
       ],
       "flags": {},
-      "order": 1,
+      "order": 4,
       "mode": 0,
       "inputs": [
         {
@@ -172,7 +418,7 @@
         70
       ],
       "flags": {},
-      "order": 2,
+      "order": 5,
       "mode": 0,
       "inputs": [
         {
@@ -235,7 +481,7 @@
         70
       ],
       "flags": {},
-      "order": 3,
+      "order": 6,
       "mode": 0,
       "inputs": [
         {
@@ -297,7 +543,7 @@
         82
       ],
       "flags": {},
-      "order": 24,
+      "order": 7,
       "mode": 0,
       "inputs": [
         {
@@ -377,7 +623,7 @@
         82
       ],
       "flags": {},
-      "order": 21,
+      "order": 8,
       "mode": 0,
       "inputs": [
         {
@@ -449,7 +695,7 @@
         170
       ],
       "flags": {},
-      "order": 4,
+      "order": 9,
       "mode": 0,
       "inputs": [
         {
@@ -532,7 +778,7 @@
       "flags": {
         "collapsed": false
       },
-      "order": 5,
+      "order": 10,
       "mode": 0,
       "inputs": [
         {
@@ -591,7 +837,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 22,
+      "order": 11,
       "mode": 0,
       "inputs": [
         {
@@ -670,7 +916,7 @@
         60
       ],
       "flags": {},
-      "order": 29,
+      "order": 12,
       "mode": 0,
       "inputs": [
         {
@@ -721,7 +967,7 @@
         63.71213949066669
       ],
       "flags": {},
-      "order": 6,
+      "order": 13,
       "mode": 0,
       "inputs": [
         {
@@ -775,7 +1021,7 @@
         106
       ],
       "flags": {},
-      "order": 26,
+      "order": 14,
       "mode": 0,
       "inputs": [
         {
@@ -859,7 +1105,7 @@
         87.48485579626674
       ],
       "flags": {},
-      "order": 7,
+      "order": 15,
       "mode": 0,
       "inputs": [
         {
@@ -915,7 +1161,7 @@
         560
       ],
       "flags": {},
-      "order": 28,
+      "order": 16,
       "mode": 0,
       "inputs": [
         {
@@ -942,7 +1188,7 @@
           "name": "ref_images.ref_image_0",
           "shape": 7,
           "type": "IMAGE",
-          "link": 2002
+          "link": 92
         },
         {
           "label": "ref_image_1",
@@ -950,7 +1196,7 @@
           "name": "ref_images.ref_image_1",
           "shape": 7,
           "type": "IMAGE",
-          "link": 2003
+          "link": 90
         },
         {
           "label": "ref_image_2",
@@ -966,7 +1212,7 @@
           "name": "ref_videos.ref_video_0",
           "shape": 7,
           "type": "IMAGE",
-          "link": 2001
+          "link": 91
         },
         {
           "label": "ref_video_1",
@@ -999,7 +1245,7 @@
           "widget": {
             "name": "prompt"
           },
-          "link": 2004
+          "link": 48
         },
         {
           "localized_name": "width",
@@ -1072,12 +1318,14 @@
         }
       },
       "widgets_values": [
+        "",
         1344,
         768,
         124,
         "max"
       ],
       "widgets_values_named": {
+        "prompt": "",
         "width": 1344,
         "height": 768,
         "length": 124,
@@ -1098,7 +1346,7 @@
         329.2886091546833
       ],
       "flags": {},
-      "order": 30,
+      "order": 17,
       "mode": 0,
       "inputs": [
         {
@@ -1172,7 +1420,7 @@
         60
       ],
       "flags": {},
-      "order": 31,
+      "order": 18,
       "mode": 0,
       "inputs": [
         {
@@ -1223,7 +1471,7 @@
       "flags": {
         "collapsed": false
       },
-      "order": 8,
+      "order": 19,
       "mode": 0,
       "inputs": [
         {
@@ -1280,7 +1528,7 @@
         82
       ],
       "flags": {},
-      "order": 9,
+      "order": 20,
       "mode": 0,
       "inputs": [
         {
@@ -1337,7 +1585,7 @@
         302.45508394893704
       ],
       "flags": {},
-      "order": 10,
+      "order": 21,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -1377,7 +1625,7 @@
         70
       ],
       "flags": {},
-      "order": 11,
+      "order": 22,
       "mode": 0,
       "inputs": [
         {
@@ -1421,6 +1669,188 @@
       "bgcolor": "#593930"
     },
     {
+      "id": 26,
+      "type": "LoadImage",
+      "pos": [
+        -2525.899521678728,
+        807.9167331689899
+      ],
+      "size": [
+        611.4667750025745,
+        360.4332448651735
+      ],
+      "flags": {},
+      "order": 23,
+      "mode": 4,
+      "inputs": [
+        {
+          "localized_name": "изображение",
+          "name": "image",
+          "type": "COMBO",
+          "widget": {
+            "name": "image"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "выберите файл для загрузки",
+          "name": "upload",
+          "type": "IMAGEUPLOAD",
+          "widget": {
+            "name": "upload"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "ИЗОБРАЖЕНИЕ",
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            90
+          ]
+        },
+        {
+          "localized_name": "МАСКА",
+          "name": "MASK",
+          "type": "MASK",
+          "links": []
+        }
+      ],
+      "title": "Референс фона -> Picture 2 (ОПЦИОНАЛЬНО)",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.33.3",
+        "Node name for S&R": "LoadImage",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "version": "7.8",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "background_reference.png",
+        "image"
+      ],
+      "widgets_values_named": {
+        "image": "background_reference.png",
+        "upload": "image"
+      },
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
+      "id": 36,
+      "type": "PrimitiveStringMultiline",
+      "pos": [
+        -1843.4226516833728,
+        613.807650104079
+      ],
+      "size": [
+        573.778907701676,
+        275.5361288915951
+      ],
+      "flags": {},
+      "order": 24,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "значение",
+          "name": "value",
+          "type": "STRING",
+          "widget": {
+            "name": "value"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "СТРОКА",
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            42
+          ]
+        }
+      ],
+      "title": "БЛОК 1: Неизменность (EN, всегда ON)",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.33.3",
+        "Node name for S&R": "PrimitiveStringMultiline",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "version": "7.8",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "Use <Video 1> strictly and only as the source of motion, pose, timing, camera framing, body proportions, and facial identity. Preserve the subject's face, hairstyle, body shape, movement speed, trajectory, and timing exactly as in <Video 1>. Do not change the camera angle, framing, or composition. Do not alter identity or motion in any way. dont change audio."
+      ],
+      "widgets_values_named": {
+        "value": "Use <Video 1> strictly and only as the source of motion, pose, timing, camera framing, body proportions, and facial identity. Preserve the subject's face, hairstyle, body shape, movement speed, trajectory, and timing exactly as in <Video 1>. Do not change the camera angle, framing, or composition. Do not alter identity or motion in any way. dont change audio."
+      },
+      "color": "#252",
+      "bgcolor": "#363"
+    },
+    {
+      "id": 37,
+      "type": "PrimitiveStringMultiline",
+      "pos": [
+        -1233.384767900964,
+        619.9322123518099
+      ],
+      "size": [
+        562.2153336999872,
+        264.5346892420107
+      ],
+      "flags": {},
+      "order": 25,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "значение",
+          "name": "value",
+          "type": "STRING",
+          "widget": {
+            "name": "value"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "СТРОКА",
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            43
+          ]
+        }
+      ],
+      "title": "БЛОК 2: Смена одежды (bypass-группа)",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.33.3",
+        "Node name for S&R": "PrimitiveStringMultiline",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "version": "7.8",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "Replace the subject's clothing with the outfit shown in <Picture 1>. Keep the fabric behaving naturally with the body's movement. keep  crotch bare. Don't create cowards. dont change other."
+      ],
+      "widgets_values_named": {
+        "value": "Replace the subject's clothing with the outfit shown in <Picture 1>. Keep the fabric behaving naturally with the body's movement. keep  crotch bare. Don't create cowards. dont change other."
+      },
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
       "id": 57,
       "type": "MarkdownNote",
       "pos": [
@@ -1432,7 +1862,7 @@
         822.6875
       ],
       "flags": {},
-      "order": 15,
+      "order": 26,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -1454,6 +1884,116 @@
       "bgcolor": "#000"
     },
     {
+      "id": 41,
+      "type": "PrimitiveStringMultiline",
+      "pos": [
+        -635.3222120853053,
+        617.4708891025251
+      ],
+      "size": [
+        563.4104205378026,
+        265.7297760798265
+      ],
+      "flags": {},
+      "order": 27,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "значение",
+          "name": "value",
+          "type": "STRING",
+          "widget": {
+            "name": "value"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "СТРОКА",
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            47
+          ]
+        }
+      ],
+      "title": "БЛОК 3: Смена фона (bypass-группа)",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.33.3",
+        "Node name for S&R": "PrimitiveStringMultiline",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "version": "7.8",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "replace the background in first frame with:\n\nroom geometry and perspective from <Video 1>, but restyle the room: replace the wooden wall panels with warm beige plaster, add a tall floor lamp in the corner and a framed picture on the wall. Walls, floor and furniture must stay at their original positions and scale, only their appearance changes."
+      ],
+      "widgets_values_named": {
+        "value": "replace the background in first frame with:\n\nroom geometry and perspective from <Video 1>, but restyle the room: replace the wooden wall panels with warm beige plaster, add a tall floor lamp in the corner and a framed picture on the wall. Walls, floor and furniture must stay at their original positions and scale, only their appearance changes."
+      },
+      "color": "#234",
+      "bgcolor": "#345"
+    },
+    {
+      "id": 39,
+      "type": "PrimitiveStringMultiline",
+      "pos": [
+        -1841.9182162326315,
+        992.7121625045991
+      ],
+      "size": [
+        555.6256833012027,
+        182.74644631018464
+      ],
+      "flags": {},
+      "order": 28,
+      "mode": 4,
+      "inputs": [
+        {
+          "localized_name": "значение",
+          "name": "value",
+          "type": "STRING",
+          "widget": {
+            "name": "value"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "СТРОКА",
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            45
+          ]
+        }
+      ],
+      "title": "БЛОК 4: Запасной / доп. инструкции (bypass-группа, пусто по умолчанию)",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.33.3",
+        "Node name for S&R": "PrimitiveStringMultiline",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "version": "7.8",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "Replace the background in first frame with the scene shown in <Picture 2>, with lighting consistent with the new environment. "
+      ],
+      "widgets_values_named": {
+        "value": "Replace the background in first frame with the scene shown in <Picture 2>, with lighting consistent with the new environment. "
+      },
+      "color": "#233",
+      "bgcolor": "#355"
+    },
+    {
       "id": 56,
       "type": "MarkdownNote",
       "pos": [
@@ -1465,7 +2005,7 @@
         756.4107331391108
       ],
       "flags": {},
-      "order": 18,
+      "order": 29,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -1498,7 +2038,7 @@
         173.19373175844652
       ],
       "flags": {},
-      "order": 32,
+      "order": 30,
       "mode": 0,
       "inputs": [
         {
@@ -1606,7 +2146,7 @@
       "flags": {
         "collapsed": false
       },
-      "order": 33,
+      "order": 31,
       "mode": 0,
       "inputs": [
         {
@@ -1661,7 +2201,7 @@
           "widget": {
             "name": "filename_prefix"
           },
-          "link": null
+          "link": 93
         },
         {
           "localized_name": "format",
@@ -1732,7 +2272,7 @@
           "name": "Filenames",
           "type": "VHS_FILENAMES",
           "links": [
-            2005
+            96
           ]
         }
       ],
@@ -1751,7 +2291,6 @@
       "widgets_values": {
         "frame_rate": 24,
         "loop_count": 0,
-        "filename_prefix": "OF/MiniMax_H3_edit",
         "format": "video/h264-mp4",
         "pix_fmt": "yuv420p",
         "crf": 3,
@@ -1804,162 +2343,163 @@
       "bgcolor": "#355"
     },
     {
-      "id": 201,
+      "id": 200,
       "type": "BatchMiniMaxLoader",
       "pos": [
-        -1180.0,
-        380.0
+        -2600,
+        1400
       ],
       "size": [
-        330,
-        60
+        380,
+        220
       ],
       "flags": {},
-      "order": 12,
+      "order": 32,
       "mode": 0,
-      "inputs": [],
+      "inputs": [
+        {
+          "name": "folder_path",
+          "type": "STRING",
+          "widget": {
+            "name": "folder_path"
+          },
+          "link": null
+        },
+        {
+          "name": "task_index",
+          "type": "INT",
+          "widget": {
+            "name": "task_index"
+          },
+          "link": null
+        },
+        {
+          "name": "fallback_prompt",
+          "type": "STRING",
+          "widget": {
+            "name": "fallback_prompt"
+          },
+          "link": null
+        }
+      ],
       "outputs": [
         {
           "name": "video_frames",
           "type": "IMAGE",
           "links": [
-            2001
-          ]
+            91
+          ],
+          "slot_index": 0
         },
         {
           "name": "video_audio",
           "type": "AUDIO",
-          "links": []
+          "links": [],
+          "slot_index": 1
         },
         {
-          "name": "ref_image_1",
+          "name": "ref_image",
           "type": "IMAGE",
           "links": [
-            2002
-          ]
-        },
-        {
-          "name": "ref_image_2",
-          "type": "IMAGE",
-          "links": [
-            2003
-          ]
+            92
+          ],
+          "slot_index": 2
         },
         {
           "name": "prompt",
           "type": "STRING",
-          "links": [
-            2004
-          ]
+          "links": [],
+          "slot_index": 3
         },
         {
           "name": "filename",
           "type": "STRING",
-          "links": []
+          "links": [
+            93
+          ],
+          "slot_index": 4
         },
         {
-          "name": "current_index",
+          "name": "task_index",
           "type": "INT",
           "links": [
-            2006
-          ]
+            94
+          ],
+          "slot_index": 5
         },
         {
-          "name": "total_count",
+          "name": "total_tasks",
           "type": "INT",
           "links": [
-            2007
-          ]
+            95
+          ],
+          "slot_index": 6
         }
       ],
       "properties": {
-        "Node name for S&R": "BatchMiniMaxLoader",
-        "ver": "1.0.0",
-        "cnr_id": "batch-minimax"
+        "Node name for S&R": "BatchMiniMaxLoader"
       },
       "widgets_values": [
         "",
         0,
         ""
-      ],
-      "widgets_values_named": {
-        "folder_path": "C:/path/to/videos",
-        "index": 0,
-        "fallback_prompt": ""
-      },
-      "color": "#322",
-      "bgcolor": "#533",
-      "title": "BATCH ROOT (Loader)"
+      ]
     },
     {
-      "id": 202,
+      "id": 201,
       "type": "BatchAutoQueue",
       "pos": [
-        760.0,
-        760.0
+        -2600,
+        1850
       ],
       "size": [
-        300,
-        60
+        320,
+        200
       ],
       "flags": {},
-      "order": 99,
+      "order": 33,
       "mode": 0,
       "inputs": [
         {
-          "name": "current_index",
+          "name": "task_index",
           "type": "INT",
-          "link": 2006,
-          "widget": "current_index"
+          "widget": {
+            "name": "task_index"
+          },
+          "link": 94
         },
         {
-          "name": "total_count",
+          "name": "total_tasks",
           "type": "INT",
-          "link": 2007,
-          "widget": "total_count"
+          "widget": {
+            "name": "total_tasks"
+          },
+          "link": 95
         },
         {
           "name": "trigger",
           "type": "*",
-          "link": 2005,
-          "widget": null
-        },
-        {
-          "name": "auto_next",
-          "type": "BOOLEAN",
-          "widget": "auto_next",
-          "link": null
-        },
-        {
-          "name": "delay_seconds",
-          "type": "FLOAT",
-          "widget": "delay_seconds",
-          "link": null
+          "shape": 7,
+          "link": 96
         }
       ],
       "outputs": [
         {
           "name": "status",
           "type": "STRING",
-          "links": []
+          "links": [],
+          "slot_index": 0
         }
       ],
       "properties": {
-        "Node name for S&R": "BatchAutoQueue",
-        "ver": "1.0.0",
-        "cnr_id": "batch-minimax"
+        "Node name for S&R": "BatchAutoQueue"
       },
       "widgets_values": [
+        0,
+        1,
         true,
         1.0
-      ],
-      "widgets_values_named": {
-        "auto_next": true,
-        "delay_seconds": 1.0
-      },
-      "color": "#322",
-      "bgcolor": "#533",
-      "title": "BATCH AUTO QUEUE"
+      ]
     }
   ],
   "links": [
@@ -2124,6 +2664,62 @@
       "MODEL"
     ],
     [
+      42,
+      36,
+      0,
+      38,
+      0,
+      "STRING"
+    ],
+    [
+      43,
+      37,
+      0,
+      38,
+      1,
+      "STRING"
+    ],
+    [
+      44,
+      42,
+      0,
+      40,
+      0,
+      "STRING"
+    ],
+    [
+      45,
+      39,
+      0,
+      40,
+      1,
+      "STRING"
+    ],
+    [
+      46,
+      38,
+      0,
+      42,
+      0,
+      "STRING"
+    ],
+    [
+      47,
+      41,
+      0,
+      42,
+      1,
+      "STRING"
+    ],
+    [
+      48,
+      40,
+      0,
+      30,
+      10,
+      "STRING"
+    ],
+    [
       52,
       3,
       0,
@@ -2164,60 +2760,60 @@
       "VAE"
     ],
     [
-      2001,
-      201,
+      90,
+      26,
+      0,
+      30,
+      4,
+      "IMAGE"
+    ],
+    [
+      91,
+      200,
       0,
       30,
       6,
       "IMAGE"
     ],
     [
-      2002,
-      201,
+      92,
+      200,
       2,
       30,
       3,
       "IMAGE"
     ],
     [
-      2003,
-      201,
-      3,
-      30,
+      93,
+      200,
       4,
-      "IMAGE"
-    ],
-    [
-      2004,
-      201,
-      4,
-      30,
-      10,
+      47,
+      6,
       "STRING"
     ],
     [
-      2005,
-      47,
-      0,
-      202,
-      2,
-      "*"
-    ],
-    [
-      2006,
+      94,
+      200,
+      5,
       201,
-      6,
-      202,
       0,
       "INT"
     ],
     [
-      2007,
+      95,
+      200,
+      6,
       201,
-      7,
-      202,
       1,
       "INT"
+    ],
+    [
+      96,
+      47,
+      0,
+      201,
+      2,
+      "*"
     ]
   ],
   "groups": [

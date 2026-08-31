@@ -4,74 +4,91 @@
 ![GitHub Release](https://img.shields.io/github/v/release/HELPMEEADICE/BatchMiniMax)
 ![ComfyUI](https://img.shields.io/badge/ComfyUI-compatible-brightgreen)
 
-Custom nodes for [ComfyUI](https://github.com/comfyanonymous/ComfyUI) that add batch video processing to MiniMax H3 workflows. Scans a folder for video files, automatically finds matching reference images, and processes them one by one with auto-queue support.
+Custom nodes for [ComfyUI](https://github.com/comfyanonymous/ComfyUI) that add batch video processing to MiniMax H3 workflows. Each video is run once **for every reference image it has** (e.g. `01-1.jpg`, `01-2.jpg`, `01-3.jpg` → 3 runs), with a flat auto-queue that advances task by task.
 
 ---
 
 ## 📖 Краткое описание (RU)
 
-Этот пакет добавляет в **ComfyUI** пакетную (batch) обработку видео для **MiniMax H3**. Вместо того чтобы вручную открывать каждый ролик, менять видео и картинку-референс и запускать генерацию снова, вы один раз настраиваете workflow, складываете все ролики в папку и запускаете процесс — ComfyUI сам переберёт их один за другим.
+Этот пакет добавляет в **ComfyUI** пакетную (batch) обработку видео для **MiniMax H3**. Вы один раз настраиваете workflow, складываете все ролики и картинки в папку и запускаете процесс — ComfyUI сам переберёт все задания друг за другом.
+
+### Главная идея: «ролик × картинки»
+
+**Каждый ролик прогоняется столько раз, сколько у него референс-картинок.** Каждый прогон использует **одну** конкретную картинку. Например:
+
+```
+01.mp4 + 01-1.jpg ─┐
+01.mp4 + 01-2.jpg ─┼─ 3 прогона (сохраняются как 01-1.mp4, 01-2.mp4, 01-3.mp4)
+01.mp4 + 01-3.jpg ─┘
+02.mp4 + 02-1.jpg ─ 1 прогон 02-1.mp4
+03.mp4 + 03-1.jpg ─┐
+03.mp4 + 03-2.jpg ─┼─ 3 прогона
+```
+
+Итого заданий = сумма картинок по всем роликам (пример выше: 3+1+3 = **7**). Число картинок у ролика может различаться.
 
 ### Что он умеет
 
 - **Сканирует папку** и находит все видеофайлы (`.mp4`, `.mov`, `.avi`, `.mkv`, `.webm` и т.д.), сортирует их по имени.
-- **Подбирает референс-картинку** по имени файла. Если рядом с `clip001.mp4` лежит `clip001.png` — она автоматически подхватится как `Picture`.
-- **Может передавать вторую картинку** (например, фон) по паттерну `имя_ref.png`.
-- **Тянет промпт из текстового файла.** Если рядом с роликом лежит `clip001.txt` — промпт берётся оттуда. Если файла нет — используется стандартный промпт из workflow.
-- **Не ломает работу без картинок.** Если у ролика нет референса — нода просто возвращает «пусто», ошибок не будет.
-- **Автоматически ставит следующий ролик в очередь**, когда текущий готов.
-
-### Зачем это нужно
-
-Раньше для каждого видео приходилось: вручную указывать файл в `VHS_LoadVideo`, менять картинку, при необходимости править промпт и снова жать Queue. С этим пакетом всё делается само — вы кладёте папку с роликами, нажимаете Queue один раз и получаете обработанные ролики друг за другом.
+- **Подбирает картинки-референсы** по префиксу имени: видео `01.mp4` → картинки `01-1.jpg`, `01-2.jpg`, `01-3.jpg` (любой суффикс после `01-`).
+- **Прогоняет каждый ролик по разу на каждую картинку**, каждый раз с одной картинкой как `Picture 1`.
+- **Один промпт на весь ролик.** Если рядом лежит `01.txt` — его текст применяется ко **всем** прогонам `01-1`, `01-2`, `01-3`. Если файла нет — используется стандартный промпт workflow.
+- **Не ломается без картинок.** Если у ролика нет ни одной картинки — он просто прогонится один раз без референса (без ошибок).
+- **Автоматически ставит следующее задание в очередь**, когда текущее сохранено.
 
 ### Конвенция имён файлов
 
 ```
 моя_папка/
-├── clip_001.mp4        ← видео
-├── clip_001.png        ← референс 1 (опционально)
-├── clip_001_ref.png    ← референс 2 (фон, опционально)
-├── clip_001.txt        ← свой промпт для этого ролика (опционально)
-├── clip_002.mp4        ← видео без картинок
-└── clip_003.mov        ← ещё одно видео
+├── 01.mp4              ← ролик
+├── 01-1.jpg            ← референс (прогон A)
+├── 01-2.jpg            ← референс (прогон B)
+├── 01-3.jpg            ← референс (прогон C)
+├── 01.txt              ← свой промпт на весь ролик 01 (опционально)
+├── 02.mp4              ← ролик (прогон один раз)
+├── 02-1.jpg
+├── 03.mp4              ← ролик
+├── 03-1.jpg
+└── 03-2.jpg
 ```
+
+Картинка относится к ролику, если её имя начинается с имени ролика + дефиса (`01-...`). Порядок прогонов — «ролик за роликом»: сначала все картинки первого ролика, затем второго и т.д.
 
 ---
 
 ## What it does
 
-- **Scans** a folder for video files (mp4, mov, avi, mkv, webm, etc.)
-- **Reads** an optional per-video prompt from a matching `.txt`/`.prompt` file (falls back to the workflow prompt if none)
-- **Passes** reference images to `MiniMaxH3ReferenceToVideo` (None if absent — no errors)
-- **Auto-queues** the next file after each save
+- **Scans** a folder for video files.
+- **Finds per-video reference images** by name prefix (`01.mp4` → `01-1.jpg`, `01-2.jpg`, ...).
+- **Runs each video once per reference image**, one image as `Picture 1` per run.
+- **One prompt per video** — a `01.txt` next to the video applies to all its runs (falls back to the workflow prompt otherwise).
+- **Auto-queues** the next task after each save.
 
 ## Nodes
 
 ### Batch Mini Max Loader
 
-Replaces `VHS_LoadVideo` + `LoadImage` nodes for batch processing.
+Replaces `VHS_LoadVideo` + a per-image `LoadImage` node.
 
 | Output | Type | Description |
 |--------|------|-------------|
 | `video_frames` | IMAGE | Loaded video frames `[B, H, W, C]` |
 | `video_audio` | AUDIO | Audio track `{"waveform": [1,C,T], "sample_rate": int}` |
-| `ref_image_1` | IMAGE | First matching reference image (or `None`) |
-| `ref_image_2` | IMAGE | Second matching reference image (or `None`) |
+| `ref_image` | IMAGE | The single reference image for this task (or `None`) |
 | `prompt` | STRING | Per-video prompt (from `.txt`/`.prompt`, else `fallback_prompt`) |
-| `filename` | STRING | Base filename without extension |
-| `current_index` | INT | Current batch index |
-| `total_count` | INT | Total number of video files found |
+| `filename` | STRING | Output file stem for this task, e.g. `01-2` |
+| `task_index` | INT | Flat index of the current task |
+| `total_tasks` | INT | Total number of tasks across all videos |
 
 ### Batch Auto Queue
 
-Place after your save node. Automatically queues the next batch item by modifying the loader's index in the workflow.
+Place after your save node. Queues the next task by incrementing the loader's `task_index`.
 
 | Input | Type | Default | Description |
 |-------|------|---------|-------------|
-| `current_index` | INT | — | From BatchMiniMaxLoader |
-| `total_count` | INT | — | From BatchMiniMaxLoader |
-| `trigger` | ANY | — | Connect from your save node (e.g. `VHS_VideoCombine`) to run only after generation finishes |
+| `task_index` | INT | — | From BatchMiniMaxLoader |
+| `total_tasks` | INT | — | From BatchMiniMaxLoader |
+| `trigger` | ANY | — | Connect from your save node (e.g. `VHS_VideoCombine`) so it runs only after generation finishes |
 | `auto_next` | BOOLEAN | `True` | Enable auto-queue |
 | `delay_seconds` | FLOAT | `1.0` | Delay before next queue (seconds) |
 
@@ -92,7 +109,7 @@ A modified version of the official MiniMax H3 "Ref2V / Clothing + BG edit" workf
 workflows/OF_MINIMAX_batch.json
 ```
 
-It swaps the manual `VHS_LoadVideo` + two `LoadImage` nodes + the `StringConcatenate` prompt-chain for the two batch nodes. Everything else (models, LoRA, sampler, VAE tiling decode, video combine) is untouched. Open it in ComfyUI, set the loader's `folder_path`, and hit Queue.
+It replaces the manual `VHS_LoadVideo` + outfit `LoadImage` nodes with the two batch nodes. The static background `LoadImage` and the whole `StringConcatenate` prompt-chain are kept intact. Everything else (models, LoRA, sampler, VAE tiling decode, video combine) is untouched. Open it in ComfyUI, set the loader's `folder_path`, and hit Queue.
 
 ## Workflow setup
 
@@ -100,53 +117,48 @@ It swaps the manual `VHS_LoadVideo` + two `LoadImage` nodes + the `StringConcate
 
 ```
 VHS_LoadVideo ──→ MiniMaxH3ReferenceToVideo (ref_video)
-LoadImage ──────→ MiniMaxH3ReferenceToVideo (ref_image_1)
-LoadImage ──────→ MiniMaxH3ReferenceToVideo (ref_image_2)
+LoadImage ──────→ MiniMaxH3ReferenceToVideo (ref_image_0)   ← outfit, now from batch
+LoadImage ──────→ MiniMaxH3ReferenceToVideo (ref_image_1)   ← static background
 ```
 
 ### After (batch processing)
 
 ```
 BatchMiniMaxLoader:video_frames ──→ MiniMaxH3ReferenceToVideo (ref_video)
-BatchMiniMaxLoader:ref_image_1  ──→ MiniMaxH3ReferenceToVideo (ref_image_1)
-BatchMiniMaxLoader:ref_image_2  ──→ MiniMaxH3ReferenceToVideo (ref_image_2)
+BatchMiniMaxLoader:ref_image     ──→ MiniMaxH3ReferenceToVideo (ref_image_0)
+LoadImage (bg)  ──────────────────→ MiniMaxH3ReferenceToVideo (ref_image_1, static)
+BatchMiniMaxLoader:filename      ──→ VHS_VideoCombine (filename_prefix)   → saves 01-2.mp4 etc.
 
 ... (rest of workflow unchanged) ...
 
 VHS_VideoCombine:Filenames ──→ BatchAutoQueue:trigger
-BatchMiniMaxLoader:index ──→ BatchAutoQueue:current_index
-BatchMiniMaxLoader:total ──→ BatchAutoQueue:total_count
+BatchMiniMaxLoader:task_index ──→ BatchAutoQueue:task_index
+BatchMiniMaxLoader:total_tasks ──→ BatchAutoQueue:total_tasks
 ```
 
-Delete the old `VHS_LoadVideo` and `LoadImage` nodes. Connect `BatchMiniMaxLoader` outputs to `MiniMaxH3ReferenceToVideo`. Connect `VHS_VideoCombine:Filenames` to `BatchAutoQueue:trigger` so the next file is queued only after the video is saved.
+Delete the old `VHS_LoadVideo` and the outfit `LoadImage`. Connect `BatchMiniMaxLoader` outputs to `MiniMaxH3ReferenceToVideo`, and connect the loader's `filename` output into `VHS_VideoCombine`'s `filename_prefix` input (convert the widget to an input) so each run saves under its own name (`01-1`, `01-2`, ...). Connect `VHS_VideoCombine:Filenames` to `BatchAutoQueue:trigger` so the next task is queued only after the video is saved.
 
 ### File naming convention
 
 ```
 my_folder/
-├── clip_001.mp4          ← video
-├── clip_001.png          ← reference image 1 (matched by name)
-├── clip_001_ref.png      ← reference image 2 (optional, _ref suffix)
-├── clip_001.txt          ← per-video prompt (optional)
-├── clip_002.mp4          ← video without reference image
-├── clip_003.mov          ← another video
-├── clip_003.jpg          ← reference image
+├── 01.mp4          ← video
+├── 01-1.jpg        ← reference (run A)
+├── 01-2.jpg        ← reference (run B)
+├── 01-3.jpg        ← reference (run C)
+├── 01.txt          ← per-video prompt, applies to ALL runs of 01 (optional)
+├── 02.mp4          ← video run once
+├── 02-1.jpg
+└── 03-2.jpg
 ```
 
-Matching logic: `{video_stem}.{image_ext}` → `ref_image_1`, `{video_stem}_ref.{image_ext}` → `ref_image_2`. A `{video_stem}.txt` (or `.prompt`) next to the video overrides the `fallback_prompt` for that clip.
+Matching logic: a video stem `01` claims every image whose stem starts with `01-`. Output filename for a run is `{video stem}` + image suffix, e.g. `01-2`. A `01.txt` (or `.prompt`) next to the video overrides the `fallback_prompt` for **all** runs of that video.
 
-### Per-clip prompts
+### Prompts
 
-Connect the static workflow prompt into the loader's `fallback_prompt` input. Then, for any clip that has a same-named `.txt`/`.prompt` file next to it, that file's text is used instead:
+The bundled workflow keeps the four prompt blocks (motion from `<Video 1>`, outfit from `<Picture 1>`, background from `<Picture 2>`). The `prompt` output of the loader is **not** wired into the model in this build — the original `StringConcatenate` chain stays and continues to feed `MiniMaxH3ReferenceToVideo:prompt`. To override the whole prompt for a video, drop a same-named `.txt` next to it.
 
-- `clip_001.mp4` + **`clip_001.txt`** → prompt from the file
-- `clip_002.mp4` (no txt) → uses `fallback_prompt`
-
-Wire the loader's `prompt` output into `MiniMaxH3ReferenceToVideo:prompt` (instead of the old concatenated-prompt connection), and delete the old `StringConcatenate` prompt-chain nodes.
-
-The bundled `OF_MINIMAX_batch.json` keeps all four prompt blocks combined into the loader's `fallback_prompt` widget (paste them there). To override per clip, drop a same-named `.txt` next to the video.
-
-> **Note:** the reference-tag syntax in the original workflow stays intact because `fallback_prompt` flows straight into `MiniMaxH3ReferenceToVideo:prompt`. Only the `<Picture 1>` / `<Picture 2>` / `<Video 1>` tags can be used there; per-clip `.txt` files must respect the same syntax.
+> **Note:** the reference-tag syntax (`<Picture 1>` / `<Picture 2>` / `<Video 1>`) is preserved because the existing prompt-chain is untouched. Per-video `.txt` files must respect the same syntax.
 
 ## Parameters
 
@@ -154,8 +166,8 @@ The bundled `OF_MINIMAX_batch.json` keeps all four prompt blocks combined into t
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
-| `folder_path` | `""` | Path to folder with video files |
-| `index` | `0` | Current file index (auto-managed by BatchAutoQueue) |
+| `folder_path` | `""` | Path to folder with video + image files |
+| `task_index` | `0` | Flat task index (auto-managed by BatchAutoQueue) |
 | `fallback_prompt` | `""` | Prompt used when no `.txt`/`.prompt` file matches the video |
 | `video_extensions` | `.mp4,.mov,.avi,.mkv,.webm` | Video file extensions to scan |
 | `image_extensions` | `.png,.jpg,.jpeg,.webp` | Image file extensions to match |
@@ -167,11 +179,12 @@ The bundled `OF_MINIMAX_batch.json` keeps all four prompt blocks combined into t
 
 ## How it works
 
-1. `BatchMiniMaxLoader` scans the folder, sorts files alphabetically, and loads the file at the current `index`.
-2. It outputs video frames + audio + optional reference images (None if no matching image found).
-3. `MiniMaxH3ReferenceToVideo` already handles `None` images gracefully (`if img is None: continue`).
-4. After the workflow completes and the video is saved, `BatchAutoQueue` increments the index and POSTs the modified prompt to `http://127.0.0.1:8188/prompt`.
-5. ComfyUI picks up the new prompt and processes the next file.
+1. `BatchMiniMaxLoader` scans the folder, sorts videos, pairs each video with its reference images (`01-` prefix), and flattens them into tasks **video-by-video**: all images of the first video, then all of the second, etc.
+2. It loads the video for the current `task_index`, plus the **single** reference image for that task (None if the video has no images).
+3. Output `filename` gives the save stem for this task (`01-2`), which feeds `VHS_VideoCombine:filename_prefix`.
+4. `MiniMaxH3ReferenceToVideo` already handles `None` images gracefully (`if img is None: continue`).
+5. After the workflow completes and the video is saved, `BatchAutoQueue` increments `task_index` and POSTs the modified prompt to `http://127.0.0.1:8188/prompt`.
+6. ComfyUI picks up the new prompt and processes the next task.
 
 ## Requirements
 

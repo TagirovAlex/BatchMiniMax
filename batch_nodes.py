@@ -26,7 +26,7 @@ VIDEO_EXTENSIONS = {'.mp4', '.mov', '.avi', '.mkv', '.webm', '.flv', '.wmv', '.m
 IMAGE_EXTENSIONS = {'.png', '.jpg', '.jpeg', '.webp', '.bmp', '.tiff', '.tif'}
 
 
-def _scan_folder(folder, video_exts, image_exts):
+def _scan_folder(folder, video_exts):
     """Scan folder for video files, return sorted list of full paths."""
     if not os.path.isdir(folder):
         return []
@@ -39,45 +39,86 @@ def _scan_folder(folder, video_exts, image_exts):
     return files
 
 
-def _find_matching_images(video_path, image_exts):
-    """Find images with the same stem as the video file.
+def _images_for_video(video_path, image_exts):
+    """Find all images belonging to a video file.
 
-    Returns up to 2 image paths: primary and secondary (_ref suffix).
+    A video stem like ``01`` matches every image whose stem starts with
+    ``01-`` (e.g. ``01-1.jpg``, ``01-2.jpg``, ``01-ref.jpg``). Images are
+    returned sorted by their suffix so the run order is stable:
+
+        video 01.mp4  ->  [01-1.jpg, 01-2.jpg, 01-3.jpg]
     """
     stem = os.path.splitext(os.path.basename(video_path))[0]
     folder = os.path.dirname(video_path)
-    primary = None
-    secondary = None
+    prefix = stem + "-"
+    matched = []
+    for f in os.listdir(folder):
+        f_stem, ext = os.path.splitext(f)
+        if ext.lower() not in image_exts:
+            continue
+        if not f_stem.lower().startswith(prefix.lower()):
+            continue
+        suffix = f_stem[len(stem):]
+        matched.append((suffix.lower(), os.path.join(folder, f)))
+    matched.sort(key=lambda x: x[0])
+    return [path for _, path in matched]
 
-    for ext in image_exts:
-        # Primary: exact stem match
-        candidate = os.path.join(folder, stem + ext)
-        if os.path.isfile(candidate):
-            primary = candidate
-            break
 
-    if primary is None:
-        # Try with _ref suffix
-        for ext in image_exts:
-            candidate = os.path.join(folder, stem + "_ref" + ext)
-            if os.path.isfile(candidate):
-                primary = candidate
-                break
+def _build_tasks(videos, image_exts):
+    """Build the flat list of batch tasks.
 
-    # Secondary: look for _ref or _2 pattern
-    for ext in image_exts:
-        candidate = os.path.join(folder, stem + "_ref" + ext)
-        if os.path.isfile(candidate) and candidate != primary:
-            secondary = candidate
-            break
-    if secondary is None:
-        for ext in image_exts:
-            candidate = os.path.join(folder, stem + "_2" + ext)
-            if os.path.isfile(candidate) and candidate != primary:
-                secondary = candidate
-                break
+    Iteration order is "video by video": all image-references of the first
+    video first, then all of the second, and so on.
 
-    return primary, secondary
+    Returns a list of dicts:
+        {'video': abs_path, 'refs': [image abs paths...], 'video_stem': str}
+    """
+    tasks = []
+    for video in videos:
+        stem = os.path.splitext(os.path.basename(video))[0]
+        refs = _images_for_video(video, image_exts)
+        tasks.append({
+            "video": video,
+            "refs": refs,
+            "video_stem": stem,
+        })
+    return tasks
+
+
+def _flatten_tasks(tasks):
+    """Expand per-video tasks into per-(video, image) run entries.
+
+    A video with N reference images yields N entries; each entry carries one
+    image so the batch runs the video once per reference. Videos with no
+    matching images still yield a single entry with an empty image ref.
+
+    Entries iterate video-by-video:
+        video 01 (3 refs) -> 01.1, 01.2, 01.3
+        video 02 (1 ref)  -> 02.1
+    """
+    flat = []
+    for task in tasks:
+        stem = task["video_stem"]
+        refs = task["refs"]
+        if not refs:
+            flat.append({
+                "video": task["video"],
+                "image": None,
+                "video_stem": stem,
+                "out_stem": stem,
+            })
+            continue
+        for i, img in enumerate(refs, start=1):
+            suffix = os.path.splitext(os.path.basename(img))[0][len(stem):]
+            if not suffix.startswith("-"):
+                suffix = f"-{i}"
+            flat.append({
+                "video": task["video"],
+                "image": img,
+                "video_stem": stem,
+                "out_stem": f"{stem}{suffix}",
+            })
+    return flat
 
 
 def _parse_ext_csv(csv_str, defaults):
@@ -234,9 +275,24 @@ def _get_audio(file):
 # ---------------------------------------------------------------------------
 
 class BatchMiniMaxLoader:
-    """Scans a folder for video files, loads the current one, finds matching
-    reference images. Replaces VHS_LoadVideo + LoadImage nodes for batch
-    processing of MiniMax H3 workflows."""
+    """Scans a folder for videos and their per-video reference images, then
+    serves one (video, image) task at a time.
+
+    A video is run once for every reference image it has. For a folder like::
+
+        clip_001.mp4    clip_001-1.jpg    clip_001-2.jpg    clip_001-3.jpg
+        clip_002.mp4    clip_002-1.jpg
+
+    the loader produces 4 tasks, video by video:
+
+        task 0 -> clip_001-x.mp4 with clip_001-1.jpg
+        task 1 -> clip_001-x.mp4 with clip_001-2.jpg
+        task 2 -> clip_001-x.mp4 with clip_001-3.jpg
+        task 3 -> clip_002-x.mp4 with clip_002-1.jpg
+
+    ``task_index`` is a flat index over all tasks and ``total_tasks`` the
+    total count, so BatchAutoQueue just increments a single counter.
+    """
 
     @classmethod
     def INPUT_TYPES(cls):
@@ -244,8 +300,9 @@ class BatchMiniMaxLoader:
             "required": {
                 "folder_path": ("STRING", {"default": "", "multiline": False,
                     "tooltip": "Path to folder containing video files"}),
-                "index": ("INT", {"default": 0, "min": 0, "step": 1,
-                    "tooltip": "Index of the file to process (auto-incremented by BatchAutoQueue)"}),
+                "task_index": ("INT", {"default": 0, "min": 0, "step": 1,
+                    "tooltip": "Flat index of the task to process "
+                               "(auto-incremented by BatchAutoQueue)"}),
                 "fallback_prompt": ("STRING", {"default": "", "multiline": True,
                     "tooltip": "Prompt used when no matching .txt/.prompt file is found "
                                "next to the video"}),
@@ -271,17 +328,18 @@ class BatchMiniMaxLoader:
             },
         }
 
-    RETURN_TYPES = ("IMAGE", "AUDIO", "IMAGE", "IMAGE", "STRING", "STRING", "INT", "INT")
-    RETURN_NAMES = ("video_frames", "video_audio", "ref_image_1", "ref_image_2",
-                    "prompt", "filename", "current_index", "total_count")
+    RETURN_TYPES = ("IMAGE", "AUDIO", "IMAGE", "STRING", "STRING", "INT", "INT")
+    RETURN_NAMES = ("video_frames", "video_audio", "ref_image",
+                    "prompt", "filename", "task_index", "total_tasks")
     FUNCTION = "load"
     CATEGORY = "BatchMiniMax"
-    DESCRIPTION = ("Scans a folder for video files and optional matching reference images "
-                   "and prompt files. Outputs frames, audio, up to 2 reference images (None "
-                   "if absent) and a per-video prompt (from a matching .txt file, or the "
-                   "fallback_prompt if none exists).")
+    DESCRIPTION = ("Scans a folder of videos and their per-video reference images, "
+                   "then serves one (video, image) task at a time. A video is run once "
+                   "per reference image. Outputs frames, audio, one reference image "
+                   "(None if absent), a per-video prompt and flat task_index/total_tasks "
+                   "counters for BatchAutoQueue.")
 
-    def load(self, folder_path, index, fallback_prompt="",
+    def load(self, folder_path, task_index, fallback_prompt="",
              video_extensions=".mp4,.mov,.avi,.mkv,.webm",
              image_extensions=".png,.jpg,.jpeg,.webp",
              prompt_extensions=".txt,.prompt", force_rate=0,
@@ -291,41 +349,42 @@ class BatchMiniMaxLoader:
         i_exts = _parse_ext_csv(image_extensions, IMAGE_EXTENSIONS)
         p_exts = _parse_ext_csv(prompt_extensions, {'.txt', '.prompt'})
 
-        videos = _scan_folder(folder_path, v_exts, i_exts)
+        videos = _scan_folder(folder_path, v_exts)
         if not videos:
             raise RuntimeError(f"No video files found in: {folder_path}")
 
-        total = len(videos)
-        idx = max(0, min(index, total - 1))
-        video_path = videos[idx]
+        tasks = _build_tasks(videos, i_exts)
+        entries = _flatten_tasks(tasks)
+        total = len(entries)
+
+        # Resolve current task
+        task = entries[max(0, min(task_index, total - 1))]
 
         # Load video frames
         images, fps, total_frames = _load_video_frames(
-            video_path, force_rate, frame_load_cap, skip_first_frames, select_every_nth)
+            task["video"], force_rate, frame_load_cap, skip_first_frames, select_every_nth)
 
         # Load audio
-        audio = _get_audio(video_path)
+        audio = _get_audio(task["video"])
         if audio is None:
-            # Return silent audio placeholder
             audio = {"waveform": torch.zeros(1, 1, 1), "sample_rate": 44100}
 
-        # Find matching reference images
-        img1_path, img2_path = _find_matching_images(video_path, i_exts)
-        ref1 = _load_image_tensor(img1_path) if img1_path else None
-        ref2 = _load_image_tensor(img2_path) if img2_path else None
+        # Load the single reference image for this task
+        ref_image = _load_image_tensor(task["image"]) if task["image"] else None
 
-        # Find matching prompt file (per-video), fall back to workflow prompt
-        prompt, prompt_is_fallback = _find_prompt(video_path, p_exts, fallback_prompt)
+        # Per-video prompt (one per video, not per task)
+        prompt, prompt_is_fallback = _find_prompt(task["video"], p_exts, fallback_prompt)
 
-        filename = os.path.splitext(os.path.basename(video_path))[0]
+        filename = task["out_stem"]
 
-        logger.info(f"BatchMiniMax: [{idx+1}/{total}] {filename}"
-                     f" | ref1={'yes' if ref1 is not None else 'no'}"
-                     f" | ref2={'yes' if ref2 is not None else 'no'}"
-                     f" | prompt={'file' if not prompt_is_fallback else 'fallback'}"
-                     f" | frames={images.shape[0]}")
+        logger.info(f"BatchMiniMax: [{task_index + 1}/{total}] "
+                    f"{os.path.basename(task['video'])}"
+                    f" | ref={'yes' if ref_image is not None else 'no'}"
+                    f" | out={filename}"
+                    f" | prompt={'file' if not prompt_is_fallback else 'fallback'}"
+                    f" | frames={images.shape[0]}")
 
-        return (images, audio, ref1, ref2, prompt, filename, idx, total)
+        return (images, audio, ref_image, prompt, filename, task_index, total)
 
 
 # ---------------------------------------------------------------------------
@@ -333,21 +392,21 @@ class BatchMiniMaxLoader:
 # ---------------------------------------------------------------------------
 
 class BatchAutoQueue:
-    """Place after save nodes. Automatically queues the next batch item
-    by modifying the BatchMiniMaxLoader's index in the workflow prompt."""
+    """Place after save nodes. Automatically queues the next batch task
+    by incrementing the BatchMiniMaxLoader's task_index in the workflow prompt."""
 
     @classmethod
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "current_index": ("INT", {"default": 0, "min": 0}),
-                "total_count": ("INT", {"default": 1, "min": 1}),
+                "task_index": ("INT", {"default": 0, "min": 0}),
+                "total_tasks": ("INT", {"default": 1, "min": 1}),
             },
             "optional": {
                 "trigger": ("*", {"tooltip": "Connect from your save node to ensure "
                                           "this runs only AFTER generation finishes"}),
                 "auto_next": ("BOOLEAN", {"default": True,
-                    "tooltip": "Automatically queue the next file"}),
+                    "tooltip": "Automatically queue the next task"}),
                 "delay_seconds": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 60.0, "step": 0.1,
                     "tooltip": "Delay before queuing next (seconds)"}),
             },
@@ -362,24 +421,26 @@ class BatchAutoQueue:
     FUNCTION = "run"
     OUTPUT_NODE = True
     CATEGORY = "BatchMiniMax"
-    DESCRIPTION = ("Auto-queues the next batch item after generation. "
-                   "Connect trigger from your save node (e.g. VHS_VideoCombine) so it "
-                   "only runs after the video is saved.")
+    DESCRIPTION = ("Auto-queues the next batch task after generation. Connects to "
+                   "BatchMiniMaxLoader's task_index/total_tasks and increments "
+                   "task_index in the next prompt so the loader advances to the next "
+                   "(video, image) pair. Connect trigger from your save node so it only "
+                   "runs after the video is saved.")
 
-    def run(self, current_index, total_count, trigger=None, auto_next=True, delay_seconds=1.0,
+    def run(self, task_index, total_tasks, trigger=None, auto_next=True, delay_seconds=1.0,
             prompt=None, unique_id=None):
 
-        status = f"[Batch] {current_index + 1}/{total_count}"
+        status = f"[Batch] {task_index + 1}/{total_tasks}"
 
-        if not auto_next or current_index >= total_count - 1:
-            if current_index >= total_count - 1:
-                status += " — DONE (all files processed)"
+        if not auto_next or task_index >= total_tasks - 1:
+            if task_index >= total_tasks - 1:
+                status += " — DONE (all tasks processed)"
             else:
                 status += " — auto_next disabled"
             return {"ui": {"text": [status]}, "result": (status,)}
 
-        next_index = current_index + 1
-        status += f" — queuing next ({next_index + 1}/{total_count})..."
+        next_index = task_index + 1
+        status += f" — queuing next ({next_index + 1}/{total_tasks})..."
 
         # Build modified prompt
         if prompt is None:
@@ -389,7 +450,7 @@ class BatchAutoQueue:
         prompt_data = prompt[0] if isinstance(prompt, list) else prompt
         modified = copy.deepcopy(prompt_data)
 
-        # Find BatchMiniMaxLoader node and update its index
+        # Find BatchMiniMaxLoader node and update its task_index
         found = False
         for node_id, node_info in modified.items():
             if not isinstance(node_info, dict):
@@ -397,7 +458,7 @@ class BatchAutoQueue:
             if node_info.get("class_type") == "BatchMiniMaxLoader":
                 inputs = node_info.get("inputs", {})
                 if isinstance(inputs, dict):
-                    inputs["index"] = next_index
+                    inputs["task_index"] = next_index
                     found = True
                     break
 
@@ -421,7 +482,7 @@ class BatchAutoQueue:
                 result = json.loads(resp.read())
                 prompt_id = result.get("prompt_id", "?")
                 status += f" queued ({prompt_id[:8]}...)"
-                logger.info(f"BatchAutoQueue: queued prompt {prompt_id} for index {next_index}")
+                logger.info(f"BatchAutoQueue: queued prompt {prompt_id} for task_index {next_index}")
         except Exception as e:
             status += f" ERROR: {e}"
             logger.error(f"BatchAutoQueue: failed to queue: {e}")
