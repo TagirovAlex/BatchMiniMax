@@ -2,7 +2,7 @@
   "id": "minimax-h3-ref2v-clothing-bg-edit",
   "revision": 0,
   "last_node_id": 201,
-  "last_link_id": 96,
+  "last_link_id": 97,
   "nodes": [
     {
       "id": 38,
@@ -845,7 +845,7 @@
           "localized_name": "values.a",
           "name": "values.a",
           "type": "FLOAT,INT,BOOLEAN",
-          "link": 19
+          "link": 94
         },
         {
           "label": "b",
@@ -1614,61 +1614,6 @@
       "bgcolor": "#335"
     },
     {
-      "id": 20,
-      "type": "PrimitiveFloat",
-      "pos": [
-        -1633.633500260234,
-        346.0274035824159
-      ],
-      "size": [
-        270,
-        70
-      ],
-      "flags": {},
-      "order": 22,
-      "mode": 0,
-      "inputs": [
-        {
-          "localized_name": "значение",
-          "name": "value",
-          "type": "FLOAT",
-          "widget": {
-            "name": "value"
-          },
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "localized_name": "ПЛАВАЮЩИЙ",
-          "name": "FLOAT",
-          "type": "FLOAT",
-          "links": [
-            19
-          ]
-        }
-      ],
-      "title": "Duration (seconds)",
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.33.3",
-        "Node name for S&R": "PrimitiveFloat",
-        "ue_properties": {
-          "widget_ue_connectable": {},
-          "version": "7.8",
-          "input_ue_unconnectable": {}
-        }
-      },
-      "widgets_values": [
-        5
-      ],
-      "widgets_values_named": {
-        "value": 5
-      },
-      "color": "#332922",
-      "bgcolor": "#593930"
-    },
-    {
       "id": 26,
       "type": "LoadImage",
       "pos": [
@@ -1680,7 +1625,7 @@
         360.4332448651735
       ],
       "flags": {},
-      "order": 23,
+      "order": 22,
       "mode": 4,
       "inputs": [
         {
@@ -1752,7 +1697,7 @@
         275.5361288915951
       ],
       "flags": {},
-      "order": 24,
+      "order": 23,
       "mode": 0,
       "inputs": [
         {
@@ -1807,7 +1752,7 @@
         264.5346892420107
       ],
       "flags": {},
-      "order": 25,
+      "order": 24,
       "mode": 0,
       "inputs": [
         {
@@ -1862,7 +1807,7 @@
         822.6875
       ],
       "flags": {},
-      "order": 26,
+      "order": 25,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -1895,7 +1840,7 @@
         265.7297760798265
       ],
       "flags": {},
-      "order": 27,
+      "order": 26,
       "mode": 0,
       "inputs": [
         {
@@ -1950,7 +1895,7 @@
         182.74644631018464
       ],
       "flags": {},
-      "order": 28,
+      "order": 27,
       "mode": 4,
       "inputs": [
         {
@@ -2005,7 +1950,7 @@
         756.4107331391108
       ],
       "flags": {},
-      "order": 29,
+      "order": 28,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -2038,7 +1983,7 @@
         173.19373175844652
       ],
       "flags": {},
-      "order": 30,
+      "order": 29,
       "mode": 0,
       "inputs": [
         {
@@ -2146,7 +2091,7 @@
       "flags": {
         "collapsed": false
       },
-      "order": 31,
+      "order": 30,
       "mode": 0,
       "inputs": [
         {
@@ -2272,7 +2217,7 @@
           "name": "Filenames",
           "type": "VHS_FILENAMES",
           "links": [
-            96
+            97
           ]
         }
       ],
@@ -2350,11 +2295,11 @@
         1400
       ],
       "size": [
-        380,
-        220
+        400,
+        260
       ],
       "flags": {},
-      "order": 32,
+      "order": 31,
       "mode": 0,
       "inputs": [
         {
@@ -2420,20 +2365,28 @@
           "slot_index": 4
         },
         {
-          "name": "task_index",
-          "type": "INT",
+          "name": "duration",
+          "type": "FLOAT",
           "links": [
             94
           ],
           "slot_index": 5
         },
         {
-          "name": "total_tasks",
+          "name": "task_index",
           "type": "INT",
           "links": [
             95
           ],
           "slot_index": 6
+        },
+        {
+          "name": "total_tasks",
+          "type": "INT",
+          "links": [
+            96
+          ],
+          "slot_index": 7
         }
       ],
       "properties": {
@@ -2450,14 +2403,14 @@
       "type": "BatchAutoQueue",
       "pos": [
         -2600,
-        1850
+        1880
       ],
       "size": [
         320,
         200
       ],
       "flags": {},
-      "order": 33,
+      "order": 32,
       "mode": 0,
       "inputs": [
         {
@@ -2466,7 +2419,7 @@
           "widget": {
             "name": "task_index"
           },
-          "link": 94
+          "link": 95
         },
         {
           "name": "total_tasks",
@@ -2474,13 +2427,13 @@
           "widget": {
             "name": "total_tasks"
           },
-          "link": 95
+          "link": 96
         },
         {
           "name": "trigger",
           "type": "*",
           "shape": 7,
-          "link": 96
+          "link": 97
         }
       ],
       "outputs": [
@@ -2574,14 +2527,6 @@
       13,
       1,
       "VAE"
-    ],
-    [
-      19,
-      20,
-      0,
-      21,
-      0,
-      "FLOAT,INT,BOOLEAN"
     ],
     [
       26,
@@ -2795,20 +2740,28 @@
       94,
       200,
       5,
-      201,
+      21,
       0,
-      "INT"
+      "FLOAT"
     ],
     [
       95,
       200,
       6,
       201,
-      1,
+      0,
       "INT"
     ],
     [
       96,
+      200,
+      7,
+      201,
+      1,
+      "INT"
+    ],
+    [
+      97,
       47,
       0,
       201,

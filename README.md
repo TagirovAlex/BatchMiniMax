@@ -35,6 +35,7 @@ Custom nodes for [ComfyUI](https://github.com/comfyanonymous/ComfyUI) that add b
 - **Один промпт на весь ролик.** Если рядом лежит `01.txt` — его текст применяется ко **всем** прогонам `01-1`, `01-2`, `01-3`. Если файла нет — используется стандартный промпт workflow.
 - **Не ломается без картинок.** Если у ролика нет ни одной картинки — он просто прогонится один раз без референса (без ошибок).
 - **Автоматически ставит следующее задание в очередь**, когда текущее сохранено.
+- **Поддерживает ролики разной длины.** Длительность каждого ролика автоматически подставляется в узел расчёта длины (как при ручном указании): ролик 9 с даст ~9.4 с (округляется до сетки кадров 17k+5).
 
 ### Конвенция имён файлов
 
@@ -77,6 +78,7 @@ Replaces `VHS_LoadVideo` + a per-image `LoadImage` node.
 | `ref_image` | IMAGE | The single reference image for this task (or `None`) |
 | `prompt` | STRING | Per-video prompt (from `.txt`/`.prompt`, else `fallback_prompt`) |
 | `filename` | STRING | Output file stem for this task, e.g. `01-2` |
+| `duration` | FLOAT | Actual duration of the source video in seconds |
 | `task_index` | INT | Flat index of the current task |
 | `total_tasks` | INT | Total number of tasks across all videos |
 
@@ -128,6 +130,7 @@ BatchMiniMaxLoader:video_frames ──→ MiniMaxH3ReferenceToVideo (ref_video)
 BatchMiniMaxLoader:ref_image     ──→ MiniMaxH3ReferenceToVideo (ref_image_0)
 LoadImage (bg)  ──────────────────→ MiniMaxH3ReferenceToVideo (ref_image_1, static)
 BatchMiniMaxLoader:filename      ──→ VHS_VideoCombine (filename_prefix)   → saves 01-2.mp4 etc.
+BatchMiniMaxLoader:duration      ──→ ComfyMathExpression (values.a)      → length from real clip
 
 ... (rest of workflow unchanged) ...
 
@@ -181,7 +184,7 @@ The bundled workflow keeps the four prompt blocks (motion from `<Video 1>`, outf
 
 1. `BatchMiniMaxLoader` scans the folder, sorts videos, pairs each video with its reference images (`01-` prefix), and flattens them into tasks **video-by-video**: all images of the first video, then all of the second, etc.
 2. It loads the video for the current `task_index`, plus the **single** reference image for that task (None if the video has no images).
-3. Output `filename` gives the save stem for this task (`01-2`), which feeds `VHS_VideoCombine:filename_prefix`.
+3. Output `filename` gives the save stem for this task (`01-2`), which feeds `VHS_VideoCombine:filename_prefix`. Output `duration` (in seconds) feeds the length-computation node (`ComfyMathExpression`), so the video's `length` is derived from each clip's real duration instead of a fixed value — clips of different lengths are handled automatically (the length is snapped to the model's 17k+5 frame grid, exactly like the manual calculation).
 4. `MiniMaxH3ReferenceToVideo` already handles `None` images gracefully (`if img is None: continue`).
 5. After the workflow completes and the video is saved, `BatchAutoQueue` increments `task_index` and POSTs the modified prompt to `http://127.0.0.1:8188/prompt`.
 6. ComfyUI picks up the new prompt and processes the next task.

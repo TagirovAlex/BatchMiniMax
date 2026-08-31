@@ -328,16 +328,17 @@ class BatchMiniMaxLoader:
             },
         }
 
-    RETURN_TYPES = ("IMAGE", "AUDIO", "IMAGE", "STRING", "STRING", "INT", "INT")
+    RETURN_TYPES = ("IMAGE", "AUDIO", "IMAGE", "STRING", "STRING", "FLOAT", "INT", "INT")
     RETURN_NAMES = ("video_frames", "video_audio", "ref_image",
-                    "prompt", "filename", "task_index", "total_tasks")
+                    "prompt", "filename", "duration", "task_index", "total_tasks")
     FUNCTION = "load"
     CATEGORY = "BatchMiniMax"
     DESCRIPTION = ("Scans a folder of videos and their per-video reference images, "
                    "then serves one (video, image) task at a time. A video is run once "
                    "per reference image. Outputs frames, audio, one reference image "
-                   "(None if absent), a per-video prompt and flat task_index/total_tasks "
-                   "counters for BatchAutoQueue.")
+                   "(None if absent), a per-video prompt, the video's duration in "
+                   "seconds (for the length-computation node), and flat "
+                   "task_index/total_tasks counters for BatchAutoQueue.")
 
     def load(self, folder_path, task_index, fallback_prompt="",
              video_extensions=".mp4,.mov,.avi,.mkv,.webm",
@@ -377,14 +378,18 @@ class BatchMiniMaxLoader:
 
         filename = task["out_stem"]
 
+        # Actual duration of the source video in seconds (informs the length node)
+        duration = float(total_frames) / fps if fps > 0 else float(images.shape[0]) / 24.0
+
         logger.info(f"BatchMiniMax: [{task_index + 1}/{total}] "
                     f"{os.path.basename(task['video'])}"
                     f" | ref={'yes' if ref_image is not None else 'no'}"
                     f" | out={filename}"
                     f" | prompt={'file' if not prompt_is_fallback else 'fallback'}"
-                    f" | frames={images.shape[0]}")
+                    f" | frames={images.shape[0]}"
+                    f" | dur={duration:.2f}s")
 
-        return (images, audio, ref_image, prompt, filename, task_index, total)
+        return (images, audio, ref_image, prompt, filename, duration, task_index, total)
 
 
 # ---------------------------------------------------------------------------
