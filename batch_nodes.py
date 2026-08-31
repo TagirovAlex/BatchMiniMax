@@ -393,11 +393,12 @@ class BatchMiniMaxLoader:
         if audio is None:
             audio = {"waveform": torch.zeros(1, 1, 1), "sample_rate": 44100}
 
-        # Feed the model a length (in seconds) that, at 24 fps, snaps DOWN to the
-        # nearest 17k+5 frame grid. The model takes the first N frames of the source
-        # clip itself (frame-for-frame, no invented frames), exactly like the manual
-        # workflow — we do NOT trim the frames here.
-        base = max(5, round(duration * 24))
+        # Actual duration of the source video in seconds
+        duration_src = float(total_frames) / fps if fps > 0 else float(images.shape[0]) / 24.0
+
+        # Snap DOWN to the 17k+5 grid (24 fps) — no invented frames, model takes
+        # the first N frames of the source itself (we do NOT trim frames here).
+        base = max(5, round(duration_src * 24))
         length_frames = base - ((base - 5) % 17)
         duration = float(length_frames) / 24.0
 
@@ -408,9 +409,6 @@ class BatchMiniMaxLoader:
         prompt, prompt_is_fallback = _find_prompt(task["video"], p_exts, fallback_prompt)
 
         filename = task["out_stem"]
-
-        # Actual duration of the source video in seconds (informs the length node)
-        duration = float(total_frames) / fps if fps > 0 else float(images.shape[0]) / 24.0
 
         logger.info(f"BatchMiniMax: [{task_index + 1}/{total}] "
                     f"{os.path.basename(task['video'])}"
