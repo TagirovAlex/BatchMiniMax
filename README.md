@@ -1,7 +1,7 @@
 # BatchMiniMax — Batch Processor for MiniMax H3
 
 ![GitHub License](https://img.shields.io/github/license/TagirovAlex/BatchMiniMax)
-![GitHub Release](https://img.shields.io/github/v/release/HELPMEEADICE/BatchMiniMax)
+![GitHub Release](https://img.shields.io/github/v/release/TagirovAlex/BatchMiniMax)
 ![ComfyUI](https://img.shields.io/badge/ComfyUI-compatible-brightgreen)
 
 Custom nodes for [ComfyUI](https://github.com/comfyanonymous/ComfyUI) that add batch video processing to MiniMax H3 workflows. Each video is run once **for every reference image it has** (e.g. `01-1.jpg`, `01-2.jpg`, `01-3.jpg` → 3 runs), with a flat auto-queue that advances task by task.
