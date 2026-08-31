@@ -39,6 +39,25 @@ def _scan_folder(folder, video_exts):
     return files
 
 
+def _resolve_folder(path):
+    """Resolve a possibly-relative folder to an absolute path.
+
+    Order of resolution:
+      1. as-is (absolute path, or relative to the current working dir)
+      2. relative to ComfyUI's ``input`` directory
+    """
+    if not path:
+        return ""
+    if os.path.isdir(path):
+        return os.path.abspath(path)
+    base = folder_paths.get_input_directory()
+    candidate = os.path.join(base, path)
+    if os.path.isdir(candidate):
+        return candidate
+    # fall back to abspath so the error message reflects the tried cwd path
+    return os.path.abspath(path)
+
+
 def _images_for_video(video_path, image_exts):
     """Find all images belonging to a video file.
 
@@ -350,9 +369,13 @@ class BatchMiniMaxLoader:
         i_exts = _parse_ext_csv(image_extensions, IMAGE_EXTENSIONS)
         p_exts = _parse_ext_csv(prompt_extensions, {'.txt', '.prompt'})
 
-        videos = _scan_folder(folder_path, v_exts)
+        resolved = _resolve_folder(folder_path)
+        videos = _scan_folder(resolved, v_exts)
         if not videos:
-            raise RuntimeError(f"No video files found in: {folder_path}")
+            raise RuntimeError(
+                f"No video files found in: '{folder_path}' "
+                f"(resolved to '{resolved}'). "
+                f"Provide the full absolute path to the folder.")
 
         tasks = _build_tasks(videos, i_exts)
         entries = _flatten_tasks(tasks)
