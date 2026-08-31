@@ -8,8 +8,8 @@
       "id": 38,
       "type": "StringConcatenate",
       "pos": [
-        -1171.0322086505118,
-        654.5897306484412
+        -1859.4427069702067,
+        663.5011934098612
       ],
       "size": [
         296.9666809082031,
@@ -18,11 +18,10 @@
       "flags": {
         "collapsed": true
       },
-      "order": 0,
+      "order": 18,
       "mode": 0,
       "inputs": [
         {
-          "localized_name": "строка_a",
           "name": "string_a",
           "type": "STRING",
           "widget": {
@@ -31,27 +30,16 @@
           "link": 42
         },
         {
-          "localized_name": "строка_b",
           "name": "string_b",
           "type": "STRING",
           "widget": {
             "name": "string_b"
           },
           "link": 43
-        },
-        {
-          "localized_name": "разделитель",
-          "name": "delimiter",
-          "type": "STRING",
-          "widget": {
-            "name": "delimiter"
-          },
-          "link": null
         }
       ],
       "outputs": [
         {
-          "localized_name": "СТРОКА",
           "name": "STRING",
           "type": "STRING",
           "links": [
@@ -90,8 +78,8 @@
       "id": 40,
       "type": "StringConcatenate",
       "pos": [
-        -1761.4526077268254,
-        1019.6422552812313
+        -623.0132399554166,
+        658.7280134437214
       ],
       "size": [
         280,
@@ -100,11 +88,10 @@
       "flags": {
         "collapsed": true
       },
-      "order": 1,
+      "order": 22,
       "mode": 4,
       "inputs": [
         {
-          "localized_name": "строка_a",
           "name": "string_a",
           "type": "STRING",
           "widget": {
@@ -113,27 +100,16 @@
           "link": 44
         },
         {
-          "localized_name": "строка_b",
           "name": "string_b",
           "type": "STRING",
           "widget": {
             "name": "string_b"
           },
           "link": 45
-        },
-        {
-          "localized_name": "разделитель",
-          "name": "delimiter",
-          "type": "STRING",
-          "widget": {
-            "name": "delimiter"
-          },
-          "link": null
         }
       ],
       "outputs": [
         {
-          "localized_name": "СТРОКА",
           "name": "STRING",
           "type": "STRING",
           "links": [
@@ -172,8 +148,8 @@
       "id": 42,
       "type": "StringConcatenate",
       "pos": [
-        -560.2655409284872,
-        659.1671103478504
+        -1239.7645764867632,
+        672.5343044899805
       ],
       "size": [
         280,
@@ -182,11 +158,10 @@
       "flags": {
         "collapsed": true
       },
-      "order": 2,
+      "order": 20,
       "mode": 0,
       "inputs": [
         {
-          "localized_name": "строка_a",
           "name": "string_a",
           "type": "STRING",
           "widget": {
@@ -195,27 +170,16 @@
           "link": 46
         },
         {
-          "localized_name": "строка_b",
           "name": "string_b",
           "type": "STRING",
           "widget": {
             "name": "string_b"
           },
           "link": 47
-        },
-        {
-          "localized_name": "разделитель",
-          "name": "delimiter",
-          "type": "STRING",
-          "widget": {
-            "name": "delimiter"
-          },
-          "link": null
         }
       ],
       "outputs": [
         {
-          "localized_name": "СТРОКА",
           "name": "STRING",
           "type": "STRING",
           "links": [
@@ -262,31 +226,11 @@
         90
       ],
       "flags": {},
-      "order": 3,
+      "order": 0,
       "mode": 0,
-      "inputs": [
-        {
-          "localized_name": "название_unet",
-          "name": "unet_name",
-          "type": "COMBO",
-          "widget": {
-            "name": "unet_name"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "тип_данных_веса",
-          "name": "weight_dtype",
-          "type": "COMBO",
-          "widget": {
-            "name": "weight_dtype"
-          },
-          "link": null
-        }
-      ],
+      "inputs": [],
       "outputs": [
         {
-          "localized_name": "МОДЕЛЬ",
           "name": "MODEL",
           "type": "MODEL",
           "links": [
@@ -334,41 +278,11 @@
         106
       ],
       "flags": {},
-      "order": 4,
+      "order": 1,
       "mode": 0,
-      "inputs": [
-        {
-          "localized_name": "название_clip",
-          "name": "clip_name",
-          "type": "COMBO",
-          "widget": {
-            "name": "clip_name"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "тип",
-          "name": "type",
-          "type": "COMBO",
-          "widget": {
-            "name": "type"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "устройство",
-          "name": "device",
-          "shape": 7,
-          "type": "COMBO",
-          "widget": {
-            "name": "device"
-          },
-          "link": null
-        }
-      ],
+      "inputs": [],
       "outputs": [
         {
-          "localized_name": "CLIP",
           "name": "CLIP",
           "type": "CLIP",
           "links": [
@@ -418,22 +332,11 @@
         70
       ],
       "flags": {},
-      "order": 5,
+      "order": 2,
       "mode": 0,
-      "inputs": [
-        {
-          "localized_name": "название_vae",
-          "name": "vae_name",
-          "type": "COMBO",
-          "widget": {
-            "name": "vae_name"
-          },
-          "link": null
-        }
-      ],
+      "inputs": [],
       "outputs": [
         {
-          "localized_name": "VAE",
           "name": "VAE",
           "type": "VAE",
           "links": [
@@ -481,22 +384,11 @@
         70
       ],
       "flags": {},
-      "order": 6,
+      "order": 3,
       "mode": 0,
-      "inputs": [
-        {
-          "localized_name": "название_vae",
-          "name": "vae_name",
-          "type": "COMBO",
-          "widget": {
-            "name": "vae_name"
-          },
-          "link": null
-        }
-      ],
+      "inputs": [],
       "outputs": [
         {
-          "localized_name": "VAE",
           "name": "VAE",
           "type": "VAE",
           "links": [
@@ -543,38 +435,17 @@
         82
       ],
       "flags": {},
-      "order": 7,
+      "order": 17,
       "mode": 0,
       "inputs": [
         {
-          "localized_name": "model",
           "name": "model",
           "type": "MODEL",
           "link": 40
-        },
-        {
-          "localized_name": "sage_attention",
-          "name": "sage_attention",
-          "type": "COMBO",
-          "widget": {
-            "name": "sage_attention"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "allow_compile",
-          "name": "allow_compile",
-          "shape": 7,
-          "type": "BOOLEAN",
-          "widget": {
-            "name": "allow_compile"
-          },
-          "link": null
         }
       ],
       "outputs": [
         {
-          "localized_name": "МОДЕЛЬ",
           "name": "MODEL",
           "type": "MODEL",
           "links": [
@@ -615,46 +486,16 @@
         170
       ],
       "flags": {},
-      "order": 8,
+      "order": 4,
       "mode": 0,
-      "inputs": [
-        {
-          "localized_name": "aspect_ratio",
-          "name": "aspect_ratio",
-          "type": "COMBO",
-          "widget": {
-            "name": "aspect_ratio"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "megapixels",
-          "name": "megapixels",
-          "type": "FLOAT",
-          "widget": {
-            "name": "megapixels"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "кратность",
-          "name": "multiple",
-          "type": "INT",
-          "widget": {
-            "name": "multiple"
-          },
-          "link": null
-        }
-      ],
+      "inputs": [],
       "outputs": [
         {
-          "localized_name": "width",
           "name": "width",
           "type": "INT",
           "links": []
         },
         {
-          "localized_name": "height",
           "name": "height",
           "type": "INT",
           "links": []
@@ -698,22 +539,11 @@
       "flags": {
         "collapsed": false
       },
-      "order": 9,
+      "order": 5,
       "mode": 0,
-      "inputs": [
-        {
-          "localized_name": "value",
-          "name": "value",
-          "type": "INT",
-          "widget": {
-            "name": "value"
-          },
-          "link": null
-        }
-      ],
+      "inputs": [],
       "outputs": [
         {
-          "localized_name": "value",
           "name": "value",
           "type": "INT",
           "links": [
@@ -757,43 +587,30 @@
       "flags": {
         "collapsed": true
       },
-      "order": 10,
+      "order": 24,
       "mode": 0,
       "inputs": [
         {
           "label": "a",
-          "localized_name": "values.a",
           "name": "values.a",
           "type": "FLOAT,INT,BOOLEAN",
           "link": 94
         },
         {
           "label": "b",
-          "localized_name": "values.b",
           "name": "values.b",
           "shape": 7,
           "type": "FLOAT,INT,BOOLEAN",
-          "link": null
-        },
-        {
-          "localized_name": "выражение",
-          "name": "expression",
-          "type": "STRING",
-          "widget": {
-            "name": "expression"
-          },
           "link": null
         }
       ],
       "outputs": [
         {
-          "localized_name": "ПЛАВАЮЩИЙ",
           "name": "FLOAT",
           "type": "FLOAT",
           "links": []
         },
         {
-          "localized_name": "ЦЕЛОЕ",
           "name": "INT",
           "type": "INT",
           "links": [
@@ -801,7 +618,6 @@
           ]
         },
         {
-          "localized_name": "BOOL",
           "name": "BOOL",
           "type": "BOOLEAN",
           "links": []
@@ -821,7 +637,7 @@
         "max(5, round(a * 24)) - ((max(5, round(a * 24)) - 5) % 17)"
       ],
       "widgets_values_named": {
-        "expression": "max(5, round(a * 24)) + (5 - (max(5, round(a * 24)) % 17)) % 17"
+        "expression": "max(5, round(a * 24)) - ((max(5, round(a * 24)) - 5) % 17)"
       }
     },
     {
@@ -836,17 +652,15 @@
         60
       ],
       "flags": {},
-      "order": 11,
+      "order": 26,
       "mode": 0,
       "inputs": [
         {
-          "localized_name": "модель",
           "name": "model",
           "type": "MODEL",
           "link": 4
         },
         {
-          "localized_name": "кондиционирование",
           "name": "conditioning",
           "type": "CONDITIONING",
           "link": 36
@@ -854,7 +668,6 @@
       ],
       "outputs": [
         {
-          "localized_name": "ГИД",
           "name": "GUIDER",
           "type": "GUIDER",
           "links": [
@@ -887,22 +700,11 @@
         63.71213949066669
       ],
       "flags": {},
-      "order": 12,
+      "order": 6,
       "mode": 0,
-      "inputs": [
-        {
-          "localized_name": "название_сэмплера",
-          "name": "sampler_name",
-          "type": "COMBO",
-          "widget": {
-            "name": "sampler_name"
-          },
-          "link": null
-        }
-      ],
+      "inputs": [],
       "outputs": [
         {
-          "localized_name": "СЭМПЛЕР",
           "name": "SAMPLER",
           "type": "SAMPLER",
           "links": [
@@ -941,46 +743,25 @@
         106
       ],
       "flags": {},
-      "order": 13,
+      "order": 21,
       "mode": 0,
       "inputs": [
         {
-          "localized_name": "модель",
           "name": "model",
           "type": "MODEL",
           "link": 2
         },
         {
-          "localized_name": "scheduler",
-          "name": "scheduler",
-          "type": "COMBO",
-          "widget": {
-            "name": "scheduler"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "шаги",
           "name": "steps",
           "type": "INT",
           "widget": {
             "name": "steps"
           },
           "link": 3
-        },
-        {
-          "localized_name": "шумоподавление",
-          "name": "denoise",
-          "type": "FLOAT",
-          "widget": {
-            "name": "denoise"
-          },
-          "link": null
         }
       ],
       "outputs": [
         {
-          "localized_name": "СИГМЫ",
           "name": "SIGMAS",
           "type": "SIGMAS",
           "links": [
@@ -1025,22 +806,11 @@
         87.48485579626674
       ],
       "flags": {},
-      "order": 14,
+      "order": 7,
       "mode": 0,
-      "inputs": [
-        {
-          "localized_name": "сид_шума",
-          "name": "noise_seed",
-          "type": "INT",
-          "widget": {
-            "name": "noise_seed"
-          },
-          "link": null
-        }
-      ],
+      "inputs": [],
       "outputs": [
         {
-          "localized_name": "ШУМ",
           "name": "NOISE",
           "type": "NOISE",
           "links": [
@@ -1081,30 +851,26 @@
         560
       ],
       "flags": {},
-      "order": 15,
+      "order": 25,
       "mode": 0,
       "inputs": [
         {
-          "localized_name": "clip",
           "name": "clip",
           "type": "CLIP",
           "link": 26
         },
         {
-          "localized_name": "vae",
           "name": "vae",
           "type": "VAE",
           "link": 27
         },
         {
-          "localized_name": "audio_vae",
           "name": "audio_vae",
           "type": "VAE",
           "link": 28
         },
         {
           "label": "ref_image_0",
-          "localized_name": "ref_images.ref_image_0",
           "name": "ref_images.ref_image_0",
           "shape": 7,
           "type": "IMAGE",
@@ -1112,7 +878,6 @@
         },
         {
           "label": "ref_image_1",
-          "localized_name": "ref_images.ref_image_1",
           "name": "ref_images.ref_image_1",
           "shape": 7,
           "type": "IMAGE",
@@ -1120,7 +885,6 @@
         },
         {
           "label": "ref_image_2",
-          "localized_name": "ref_images.ref_image_2",
           "name": "ref_images.ref_image_2",
           "shape": 7,
           "type": "IMAGE",
@@ -1128,7 +892,6 @@
         },
         {
           "label": "ref_video_0",
-          "localized_name": "ref_videos.ref_video_0",
           "name": "ref_videos.ref_video_0",
           "shape": 7,
           "type": "IMAGE",
@@ -1136,7 +899,6 @@
         },
         {
           "label": "ref_video_1",
-          "localized_name": "ref_videos.ref_video_1",
           "name": "ref_videos.ref_video_1",
           "shape": 7,
           "type": "IMAGE",
@@ -1144,7 +906,6 @@
         },
         {
           "label": "ref_video_audio_0",
-          "localized_name": "ref_video_audios.ref_video_audio_0",
           "name": "ref_video_audios.ref_video_audio_0",
           "shape": 7,
           "type": "AUDIO",
@@ -1152,14 +913,12 @@
         },
         {
           "label": "ref_audio_0",
-          "localized_name": "ref_audios.ref_audio_0",
           "name": "ref_audios.ref_audio_0",
           "shape": 7,
           "type": "AUDIO",
           "link": null
         },
         {
-          "localized_name": "prompt",
           "name": "prompt",
           "type": "STRING",
           "widget": {
@@ -1168,7 +927,6 @@
           "link": 99
         },
         {
-          "localized_name": "width",
           "name": "width",
           "type": "INT",
           "widget": {
@@ -1177,7 +935,6 @@
           "link": 38
         },
         {
-          "localized_name": "height",
           "name": "height",
           "type": "INT",
           "widget": {
@@ -1186,27 +943,16 @@
           "link": 39
         },
         {
-          "localized_name": "length",
           "name": "length",
           "type": "INT",
           "widget": {
             "name": "length"
           },
           "link": 35
-        },
-        {
-          "localized_name": "ref_image_size",
-          "name": "ref_image_size",
-          "type": "COMBO",
-          "widget": {
-            "name": "ref_image_size"
-          },
-          "link": null
         }
       ],
       "outputs": [
         {
-          "localized_name": "positive",
           "name": "positive",
           "type": "CONDITIONING",
           "links": [
@@ -1214,7 +960,6 @@
           ]
         },
         {
-          "localized_name": "ЛАТЕНТНЫЙ",
           "name": "LATENT",
           "type": "LATENT",
           "links": [
@@ -1266,35 +1011,30 @@
         329.2886091546833
       ],
       "flags": {},
-      "order": 16,
+      "order": 27,
       "mode": 0,
       "inputs": [
         {
-          "localized_name": "шум",
           "name": "noise",
           "type": "NOISE",
           "link": 5
         },
         {
-          "localized_name": "гид",
           "name": "guider",
           "type": "GUIDER",
           "link": 6
         },
         {
-          "localized_name": "сэмплер",
           "name": "sampler",
           "type": "SAMPLER",
           "link": 7
         },
         {
-          "localized_name": "сигмы",
           "name": "sigmas",
           "type": "SIGMAS",
           "link": 8
         },
         {
-          "localized_name": "латентное_изображение",
           "name": "latent_image",
           "type": "LATENT",
           "link": 37
@@ -1302,7 +1042,6 @@
       ],
       "outputs": [
         {
-          "localized_name": "выход",
           "name": "output",
           "type": "LATENT",
           "links": [
@@ -1311,7 +1050,6 @@
           ]
         },
         {
-          "localized_name": "выход без шума",
           "name": "denoised_output",
           "type": "LATENT",
           "links": []
@@ -1340,17 +1078,15 @@
         60
       ],
       "flags": {},
-      "order": 17,
+      "order": 28,
       "mode": 0,
       "inputs": [
         {
-          "localized_name": "образцы",
           "name": "samples",
           "type": "LATENT",
           "link": 11
         },
         {
-          "localized_name": "vae",
           "name": "vae",
           "type": "VAE",
           "link": 12
@@ -1358,7 +1094,6 @@
       ],
       "outputs": [
         {
-          "localized_name": "АУДИО",
           "name": "AUDIO",
           "type": "AUDIO",
           "links": [
@@ -1391,22 +1126,11 @@
       "flags": {
         "collapsed": false
       },
-      "order": 18,
+      "order": 8,
       "mode": 0,
-      "inputs": [
-        {
-          "localized_name": "value",
-          "name": "value",
-          "type": "INT",
-          "widget": {
-            "name": "value"
-          },
-          "link": null
-        }
-      ],
+      "inputs": [],
       "outputs": [
         {
-          "localized_name": "value",
           "name": "value",
           "type": "INT",
           "links": [
@@ -1448,22 +1172,11 @@
         82
       ],
       "flags": {},
-      "order": 19,
+      "order": 9,
       "mode": 0,
-      "inputs": [
-        {
-          "localized_name": "значение",
-          "name": "value",
-          "type": "INT",
-          "widget": {
-            "name": "value"
-          },
-          "link": null
-        }
-      ],
+      "inputs": [],
       "outputs": [
         {
-          "localized_name": "ЦЕЛОЕ",
           "name": "INT",
           "type": "INT",
           "links": [
@@ -1505,7 +1218,7 @@
         302.45508394893704
       ],
       "flags": {},
-      "order": 20,
+      "order": 10,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -1537,39 +1250,19 @@
       "id": 26,
       "type": "LoadImage",
       "pos": [
-        -2525.899521678728,
-        807.9167331689899
+        -87.94609672324464,
+        634.1432093213011
       ],
       "size": [
         611.4667750025745,
         360.4332448651735
       ],
       "flags": {},
-      "order": 21,
+      "order": 11,
       "mode": 4,
-      "inputs": [
-        {
-          "localized_name": "изображение",
-          "name": "image",
-          "type": "COMBO",
-          "widget": {
-            "name": "image"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "выберите файл для загрузки",
-          "name": "upload",
-          "type": "IMAGEUPLOAD",
-          "widget": {
-            "name": "upload"
-          },
-          "link": null
-        }
-      ],
+      "inputs": [],
       "outputs": [
         {
-          "localized_name": "ИЗОБРАЖЕНИЕ",
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
@@ -1577,7 +1270,6 @@
           ]
         },
         {
-          "localized_name": "МАСКА",
           "name": "MASK",
           "type": "MASK",
           "links": []
@@ -1609,30 +1301,19 @@
       "id": 36,
       "type": "PrimitiveStringMultiline",
       "pos": [
-        -1843.4226516833728,
-        613.807650104079
+        -2538.5167470741344,
+        620.4912471751437
       ],
       "size": [
         573.778907701676,
         275.5361288915951
       ],
       "flags": {},
-      "order": 22,
+      "order": 12,
       "mode": 0,
-      "inputs": [
-        {
-          "localized_name": "значение",
-          "name": "value",
-          "type": "STRING",
-          "widget": {
-            "name": "value"
-          },
-          "link": null
-        }
-      ],
+      "inputs": [],
       "outputs": [
         {
-          "localized_name": "СТРОКА",
           "name": "STRING",
           "type": "STRING",
           "links": [
@@ -1664,30 +1345,19 @@
       "id": 37,
       "type": "PrimitiveStringMultiline",
       "pos": [
-        -1233.384767900964,
-        619.9322123518099
+        -1921.795266220659,
+        628.8436751132299
       ],
       "size": [
         562.2153336999872,
         264.5346892420107
       ],
       "flags": {},
-      "order": 23,
+      "order": 13,
       "mode": 0,
-      "inputs": [
-        {
-          "localized_name": "значение",
-          "name": "value",
-          "type": "STRING",
-          "widget": {
-            "name": "value"
-          },
-          "link": null
-        }
-      ],
+      "inputs": [],
       "outputs": [
         {
-          "localized_name": "СТРОКА",
           "name": "STRING",
           "type": "STRING",
           "links": [
@@ -1716,66 +1386,22 @@
       "bgcolor": "#653"
     },
     {
-      "id": 57,
-      "type": "MarkdownNote",
-      "pos": [
-        -3271.593903834427,
-        1810.9966266497959
-      ],
-      "size": [
-        510,
-        822.6875
-      ],
-      "flags": {},
-      "order": 24,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [],
-      "title": "Note: Model Links",
-      "properties": {
-        "ue_properties": {
-          "widget_ue_connectable": {},
-          "version": "7.8",
-          "input_ue_unconnectable": {}
-        }
-      },
-      "widgets_values": [
-        "Guide: [Subgraph](https://docs.comfy.org/interface/features/subgraph)\n\n## Model Links\n\n**text_encoders**\n\n- [gemma4_e2b_it_int8_convrot.safetensors](https://huggingface.co/Comfy-Org/gemma-4/resolve/main/text_encoders/gemma4_e2b_it_int8_convrot.safetensors) — *optional, only needed when **prompt_enhance** is enabled*\n- [gemma4-12b-with-proj-ltx-2.5-comfy-int8-convrot.safetensors](https://huggingface.co/Lightricks/LTX-2.5/resolve/main/text_encoders/gemma4-12b-with-proj-ltx-2.5-comfy-int8-convrot.safetensors)\n\n**diffusion_models**\n\n- [ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors](https://huggingface.co/Lightricks/LTX-2.5/resolve/main/diffusion_models/ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors)\n\n**vae**\n\n- [ltx-2.5-video-vae-bf16.safetensors](https://huggingface.co/Lightricks/LTX-2.5/resolve/main/vae/ltx-2.5-video-vae-bf16.safetensors)\n- [ltx-2.5-audio-vae-bf16.safetensors](https://huggingface.co/Lightricks/LTX-2.5/resolve/main/vae/ltx-2.5-audio-vae-bf16.safetensors)\n\n**latent_upscale_models**\n\n- [ltx-2.5-latent-spatial-upscaler-x2-bf16-1.0.safetensors](https://huggingface.co/Lightricks/LTX-2.5/resolve/main/latent_upscale_models/ltx-2.5-latent-spatial-upscaler-x2-bf16-1.0.safetensors)\n\n\n## Model Storage Location\n\n```\n📂 ComfyUI/\n├── 📂 models/\n│   ├── 📂 text_encoders/\n│   │   ├── gemma4_e2b_it_int8_convrot.safetensors\n│   │   └── gemma4-12b-with-proj-ltx-2.5-comfy-int8-convrot.safetensors\n│   ├── 📂 diffusion_models/\n│   │   └── ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors\n│   ├── 📂 vae/\n│   │   ├── ltx-2.5-video-vae-bf16.safetensors\n│   │   └── ltx-2.5-audio-vae-bf16.safetensors\n│   └── 📂 latent_upscale_models/\n│       └── ltx-2.5-latent-spatial-upscaler-x2-bf16-1.0.safetensors\n```\n\n## Report Issue\n\nNote: Please update ComfyUI first ([guide](https://docs.comfy.org/installation/update_comfyui)) and prepare required models. Desktop/Cloud updates follow stable releases, so some nightly-supported models may not be available yet.\n\n- Cannot run / runtime errors: [ComfyUI/issues](https://github.com/comfyanonymous/ComfyUI/issues)\n- UI / frontend issues: [ComfyUI_frontend/issues](https://github.com/Comfy-Org/ComfyUI_frontend/issues)\n- Workflow issues: [workflow_templates/issues](https://github.com/Comfy-Org/workflow_templates/issues)\n"
-      ],
-      "widgets_values_named": {
-        "text": "Guide: [Subgraph](https://docs.comfy.org/interface/features/subgraph)\n\n## Model Links\n\n**text_encoders**\n\n- [gemma4_e2b_it_int8_convrot.safetensors](https://huggingface.co/Comfy-Org/gemma-4/resolve/main/text_encoders/gemma4_e2b_it_int8_convrot.safetensors) — *optional, only needed when **prompt_enhance** is enabled*\n- [gemma4-12b-with-proj-ltx-2.5-comfy-int8-convrot.safetensors](https://huggingface.co/Lightricks/LTX-2.5/resolve/main/text_encoders/gemma4-12b-with-proj-ltx-2.5-comfy-int8-convrot.safetensors)\n\n**diffusion_models**\n\n- [ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors](https://huggingface.co/Lightricks/LTX-2.5/resolve/main/diffusion_models/ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors)\n\n**vae**\n\n- [ltx-2.5-video-vae-bf16.safetensors](https://huggingface.co/Lightricks/LTX-2.5/resolve/main/vae/ltx-2.5-video-vae-bf16.safetensors)\n- [ltx-2.5-audio-vae-bf16.safetensors](https://huggingface.co/Lightricks/LTX-2.5/resolve/main/vae/ltx-2.5-audio-vae-bf16.safetensors)\n\n**latent_upscale_models**\n\n- [ltx-2.5-latent-spatial-upscaler-x2-bf16-1.0.safetensors](https://huggingface.co/Lightricks/LTX-2.5/resolve/main/latent_upscale_models/ltx-2.5-latent-spatial-upscaler-x2-bf16-1.0.safetensors)\n\n\n## Model Storage Location\n\n```\n📂 ComfyUI/\n├── 📂 models/\n│   ├── 📂 text_encoders/\n│   │   ├── gemma4_e2b_it_int8_convrot.safetensors\n│   │   └── gemma4-12b-with-proj-ltx-2.5-comfy-int8-convrot.safetensors\n│   ├── 📂 diffusion_models/\n│   │   └── ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors\n│   ├── 📂 vae/\n│   │   ├── ltx-2.5-video-vae-bf16.safetensors\n│   │   └── ltx-2.5-audio-vae-bf16.safetensors\n│   └── 📂 latent_upscale_models/\n│       └── ltx-2.5-latent-spatial-upscaler-x2-bf16-1.0.safetensors\n```\n\n## Report Issue\n\nNote: Please update ComfyUI first ([guide](https://docs.comfy.org/installation/update_comfyui)) and prepare required models. Desktop/Cloud updates follow stable releases, so some nightly-supported models may not be available yet.\n\n- Cannot run / runtime errors: [ComfyUI/issues](https://github.com/comfyanonymous/ComfyUI/issues)\n- UI / frontend issues: [ComfyUI_frontend/issues](https://github.com/Comfy-Org/ComfyUI_frontend/issues)\n- Workflow issues: [workflow_templates/issues](https://github.com/Comfy-Org/workflow_templates/issues)\n"
-      },
-      "color": "#222",
-      "bgcolor": "#000"
-    },
-    {
       "id": 41,
       "type": "PrimitiveStringMultiline",
       "pos": [
-        -635.3222120853053,
-        617.4708891025251
+        -1314.8212476435813,
+        630.8380832446552
       ],
       "size": [
         563.4104205378026,
         265.7297760798265
       ],
       "flags": {},
-      "order": 25,
+      "order": 14,
       "mode": 0,
-      "inputs": [
-        {
-          "localized_name": "значение",
-          "name": "value",
-          "type": "STRING",
-          "widget": {
-            "name": "value"
-          },
-          "link": null
-        }
-      ],
+      "inputs": [],
       "outputs": [
         {
-          "localized_name": "СТРОКА",
           "name": "STRING",
           "type": "STRING",
           "links": [
@@ -1804,61 +1430,6 @@
       "bgcolor": "#345"
     },
     {
-      "id": 39,
-      "type": "PrimitiveStringMultiline",
-      "pos": [
-        -1841.9182162326315,
-        992.7121625045991
-      ],
-      "size": [
-        555.6256833012027,
-        182.74644631018464
-      ],
-      "flags": {},
-      "order": 26,
-      "mode": 4,
-      "inputs": [
-        {
-          "localized_name": "значение",
-          "name": "value",
-          "type": "STRING",
-          "widget": {
-            "name": "value"
-          },
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "localized_name": "СТРОКА",
-          "name": "STRING",
-          "type": "STRING",
-          "links": [
-            45
-          ]
-        }
-      ],
-      "title": "БЛОК 4: Запасной / доп. инструкции (bypass-группа, пусто по умолчанию)",
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.33.3",
-        "Node name for S&R": "PrimitiveStringMultiline",
-        "ue_properties": {
-          "widget_ue_connectable": {},
-          "version": "7.8",
-          "input_ue_unconnectable": {}
-        }
-      },
-      "widgets_values": [
-        "Replace the background in first frame with the scene shown in <Picture 2>, with lighting consistent with the new environment. "
-      ],
-      "widgets_values_named": {
-        "value": "Replace the background in first frame with the scene shown in <Picture 2>, with lighting consistent with the new environment. "
-      },
-      "color": "#233",
-      "bgcolor": "#355"
-    },
-    {
       "id": 56,
       "type": "MarkdownNote",
       "pos": [
@@ -1870,7 +1441,7 @@
         756.4107331391108
       ],
       "flags": {},
-      "order": 27,
+      "order": 15,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -1903,61 +1474,22 @@
         173.19373175844652
       ],
       "flags": {},
-      "order": 28,
+      "order": 29,
       "mode": 0,
       "inputs": [
         {
-          "localized_name": "образцы",
           "name": "samples",
           "type": "LATENT",
           "link": 53
         },
         {
-          "localized_name": "vae",
           "name": "vae",
           "type": "VAE",
           "link": 52
-        },
-        {
-          "localized_name": "размер_плитки",
-          "name": "tile_size",
-          "type": "INT",
-          "widget": {
-            "name": "tile_size"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "перекрытие",
-          "name": "overlap",
-          "type": "INT",
-          "widget": {
-            "name": "overlap"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "temporal_size",
-          "name": "temporal_size",
-          "type": "INT",
-          "widget": {
-            "name": "temporal_size"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "temporal_overlap",
-          "name": "temporal_overlap",
-          "type": "INT",
-          "widget": {
-            "name": "temporal_overlap"
-          },
-          "link": null
         }
       ],
       "outputs": [
         {
-          "localized_name": "ИЗОБРАЖЕНИЕ",
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
@@ -2011,129 +1543,43 @@
       "flags": {
         "collapsed": false
       },
-      "order": 29,
+      "order": 30,
       "mode": 0,
       "inputs": [
         {
-          "localized_name": "images",
           "name": "images",
           "type": "LATENT",
           "link": 83
         },
         {
-          "localized_name": "audio",
           "name": "audio",
           "shape": 7,
           "type": "AUDIO",
           "link": 80
         },
         {
-          "localized_name": "meta_batch",
           "name": "meta_batch",
           "shape": 7,
           "type": "VHS_BatchManager",
           "link": null
         },
         {
-          "localized_name": "vae",
           "name": "vae",
           "shape": 7,
           "type": "VAE",
           "link": 84
         },
         {
-          "localized_name": "frame_rate",
-          "name": "frame_rate",
-          "type": "FLOAT",
-          "widget": {
-            "name": "frame_rate"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "loop_count",
-          "name": "loop_count",
-          "type": "INT",
-          "widget": {
-            "name": "loop_count"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "filename_prefix",
           "name": "filename_prefix",
           "type": "STRING",
           "widget": {
             "name": "filename_prefix"
           },
           "link": 93
-        },
-        {
-          "localized_name": "format",
-          "name": "format",
-          "type": "COMBO",
-          "widget": {
-            "name": "format"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "pingpong",
-          "name": "pingpong",
-          "type": "BOOLEAN",
-          "widget": {
-            "name": "pingpong"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "save_output",
-          "name": "save_output",
-          "type": "BOOLEAN",
-          "widget": {
-            "name": "save_output"
-          },
-          "link": null
-        },
-        {
-          "name": "pix_fmt",
-          "type": [
-            "yuv420p",
-            "yuv420p10le"
-          ],
-          "widget": {
-            "name": "pix_fmt"
-          },
-          "link": null
-        },
-        {
-          "name": "crf",
-          "type": "INT",
-          "widget": {
-            "name": "crf"
-          },
-          "link": null
-        },
-        {
-          "name": "save_metadata",
-          "type": "BOOLEAN",
-          "widget": {
-            "name": "save_metadata"
-          },
-          "link": null
-        },
-        {
-          "name": "trim_to_audio",
-          "type": "BOOLEAN",
-          "widget": {
-            "name": "trim_to_audio"
-          },
-          "link": null
         }
       ],
       "outputs": [
         {
-          "localized_name": "Filenames",
           "name": "Filenames",
           "type": "VHS_FILENAMES",
           "links": [
@@ -2156,6 +1602,7 @@
       "widgets_values": {
         "frame_rate": 24,
         "loop_count": 0,
+        "filename_prefix": "AnimateDiff",
         "format": "video/h264-mp4",
         "pix_fmt": "yuv420p",
         "crf": 3,
@@ -2181,7 +1628,7 @@
       "widgets_values_named": {
         "frame_rate": 24,
         "loop_count": 0,
-        "filename_prefix": "OF/MiniMax_H3_edit",
+        "filename_prefix": "AnimateDiff",
         "format": "video/h264-mp4",
         "pix_fmt": "yuv420p",
         "crf": 3,
@@ -2219,37 +1666,17 @@
         82
       ],
       "flags": {},
-      "order": 30,
+      "order": 19,
       "mode": 0,
       "inputs": [
         {
-          "localized_name": "модель",
           "name": "model",
           "type": "MODEL",
           "link": 41
-        },
-        {
-          "localized_name": "название_lora",
-          "name": "lora_name",
-          "type": "COMBO",
-          "widget": {
-            "name": "lora_name"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "сила_модели",
-          "name": "strength_model",
-          "type": "FLOAT",
-          "widget": {
-            "name": "strength_model"
-          },
-          "link": null
         }
       ],
       "outputs": [
         {
-          "localized_name": "МОДЕЛЬ",
           "name": "MODEL",
           "type": "MODEL",
           "links": [
@@ -2291,33 +1718,17 @@
       "id": 200,
       "type": "BatchMiniMaxLoader",
       "pos": [
-        -2600,
-        1400
+        -2566.5820146446745,
+        -357.5632431210662
       ],
       "size": [
         400,
-        260
+        444
       ],
       "flags": {},
-      "order": 31,
+      "order": 23,
       "mode": 0,
       "inputs": [
-        {
-          "name": "folder_path",
-          "type": "STRING",
-          "widget": {
-            "name": "folder_path"
-          },
-          "link": null
-        },
-        {
-          "name": "task_index",
-          "type": "INT",
-          "widget": {
-            "name": "task_index"
-          },
-          "link": null
-        },
         {
           "name": "fallback_prompt",
           "type": "STRING",
@@ -2331,89 +1742,124 @@
         {
           "name": "video_frames",
           "type": "IMAGE",
+          "slot_index": 0,
           "links": [
             91
-          ],
-          "slot_index": 0
+          ]
         },
         {
           "name": "video_audio",
           "type": "AUDIO",
-          "links": [],
-          "slot_index": 1
+          "slot_index": 1,
+          "links": []
         },
         {
           "name": "ref_image",
           "type": "IMAGE",
+          "slot_index": 2,
           "links": [
             92
-          ],
-          "slot_index": 2
+          ]
         },
         {
           "name": "prompt",
           "type": "STRING",
+          "slot_index": 3,
           "links": [
             99
-          ],
-          "slot_index": 3
+          ]
         },
         {
           "name": "filename",
           "type": "STRING",
+          "slot_index": 4,
           "links": [
             93
-          ],
-          "slot_index": 4
+          ]
         },
         {
           "name": "duration",
           "type": "FLOAT",
+          "slot_index": 5,
           "links": [
             94
-          ],
-          "slot_index": 5
+          ]
         },
         {
           "name": "task_index",
           "type": "INT",
+          "slot_index": 6,
           "links": [
             95
-          ],
-          "slot_index": 6
+          ]
         },
         {
           "name": "total_tasks",
           "type": "INT",
+          "slot_index": 7,
           "links": [
             96
-          ],
-          "slot_index": 7
+          ]
         }
       ],
       "properties": {
-        "Node name for S&R": "BatchMiniMaxLoader"
+        "Node name for S&R": "BatchMiniMaxLoader",
+        "ue_properties": {
+          "widget_ue_connectable": {
+            "folder_path": true,
+            "task_index": true,
+            "fallback_prompt": true
+          },
+          "version": "7.8",
+          "input_ue_unconnectable": {}
+        }
       },
       "widgets_values": [
         "",
-        0
-      ]
+        0,
+        "",
+        ".mp4,.mov,.avi,.mkv,.webm",
+        ".png,.jpg,.jpeg,.webp",
+        ".txt,.prompt",
+        0,
+        0,
+        0,
+        1
+      ],
+      "widgets_values_named": {
+        "folder_path": "",
+        "task_index": 0,
+        "fallback_prompt": "",
+        "video_extensions": ".mp4,.mov,.avi,.mkv,.webm",
+        "image_extensions": ".png,.jpg,.jpeg,.webp",
+        "prompt_extensions": ".txt,.prompt",
+        "force_rate": 0,
+        "frame_load_cap": 0,
+        "skip_first_frames": 0,
+        "select_every_nth": 1
+      }
     },
     {
       "id": 201,
       "type": "BatchAutoQueue",
       "pos": [
-        -2600,
-        1880
+        -2562.126283263966,
+        134.24444503781783
       ],
       "size": [
         320,
         200
       ],
       "flags": {},
-      "order": 32,
+      "order": 31,
       "mode": 0,
       "inputs": [
+        {
+          "name": "trigger",
+          "shape": 7,
+          "type": "*",
+          "link": 97
+        },
         {
           "name": "task_index",
           "type": "INT",
@@ -2429,31 +1875,83 @@
             "name": "total_tasks"
           },
           "link": 96
-        },
-        {
-          "name": "trigger",
-          "type": "*",
-          "shape": 7,
-          "link": 97
         }
       ],
       "outputs": [
         {
           "name": "status",
           "type": "STRING",
-          "links": [],
-          "slot_index": 0
+          "slot_index": 0,
+          "links": []
         }
       ],
       "properties": {
-        "Node name for S&R": "BatchAutoQueue"
+        "Node name for S&R": "BatchAutoQueue",
+        "ue_properties": {
+          "widget_ue_connectable": {
+            "task_index": true,
+            "total_tasks": true
+          },
+          "version": "7.8",
+          "input_ue_unconnectable": {}
+        }
       },
       "widgets_values": [
         0,
         1,
         true,
-        1.0
-      ]
+        1
+      ],
+      "widgets_values_named": {
+        "task_index": 0,
+        "total_tasks": 1,
+        "auto_next": true,
+        "delay_seconds": 1
+      }
+    },
+    {
+      "id": 39,
+      "type": "PrimitiveStringMultiline",
+      "pos": [
+        -703.4788484612229,
+        631.7979206670891
+      ],
+      "size": [
+        555.6256833012027,
+        251.81028271118976
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 4,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            45
+          ]
+        }
+      ],
+      "title": "БЛОК 4: Запасной / доп. инструкции (bypass-группа, пусто по умолчанию)",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.33.3",
+        "Node name for S&R": "PrimitiveStringMultiline",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "version": "7.8",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "Replace the background in first frame with the scene shown in <Picture 2>, with lighting consistent with the new environment. "
+      ],
+      "widgets_values_named": {
+        "value": "Replace the background in first frame with the scene shown in <Picture 2>, with lighting consistent with the new environment. "
+      },
+      "color": "#233",
+      "bgcolor": "#355"
     }
   ],
   "links": [
@@ -2470,7 +1968,7 @@
       6,
       0,
       8,
-      2,
+      1,
       "INT"
     ],
     [
@@ -2726,7 +2224,7 @@
       200,
       4,
       47,
-      6,
+      4,
       "STRING"
     ],
     [
@@ -2742,7 +2240,7 @@
       200,
       6,
       201,
-      0,
+      1,
       "INT"
     ],
     [
@@ -2750,7 +2248,7 @@
       200,
       7,
       201,
-      1,
+      2,
       "INT"
     ],
     [
@@ -2758,7 +2256,7 @@
       47,
       0,
       201,
-      2,
+      0,
       "*"
     ],
     [
@@ -2766,7 +2264,7 @@
       40,
       0,
       200,
-      2,
+      0,
       "STRING"
     ],
     [
@@ -2783,8 +2281,8 @@
       "id": 4,
       "title": "БЛОК 1: Неизменность (всегда ON)",
       "bounding": [
-        -1859.5460117506675,
-        541.4695735904761,
+        -2554.6401071414293,
+        548.1531706615408,
         600,
         360
       ],
@@ -2795,8 +2293,8 @@
       "id": 5,
       "title": "БЛОК 2: Смена одежды",
       "bounding": [
-        -1249.4830311446638,
-        543.2009966223943,
+        -1937.8935294643586,
+        552.1124593838143,
         592.0548902201865,
         351.3887340260462
       ],
@@ -2805,12 +2303,12 @@
     },
     {
       "id": 6,
-      "title": "БЛОК 4: Смена фона картинкой",
+      "title": "БЛОК 4: Дополнительный",
       "bounding": [
-        -1858.1062364711604,
-        917.648815939357,
+        -719.6668686997516,
+        556.734574101847,
         596.8754725865581,
-        268.74863319622455
+        346.7239323586498
       ],
       "color": "#8AA",
       "flags": {}
@@ -2819,8 +2317,8 @@
       "id": 7,
       "title": "БЛОК 3: Смена фона запросом",
       "bounding": [
-        -648.9444944184187,
-        542.5752072473194,
+        -1328.4435299766947,
+        555.9424013894495,
         588.5028334151709,
         348.9985603504158
       ],
@@ -2829,10 +2327,10 @@
     },
     {
       "id": 8,
-      "title": "Load background",
+      "title": "БЛОК 5: Загрузка фона",
       "bounding": [
-        -2545.3969004679657,
-        732.5632603305019,
+        -107.44347551248238,
+        558.789736482812,
         651.8623959637152,
         451.51032218089085
       ],
@@ -2844,10 +2342,10 @@
   "extra": {
     "ue_links": [],
     "ds": {
-      "scale": 0.6571760615276129,
+      "scale": 0.49374610182390155,
       "offset": [
-        2189.2123981762275,
-        568.3629348857954
+        4033.712269476181,
+        -563.720197552316
       ]
     },
     "links_added_by_ue": [],
