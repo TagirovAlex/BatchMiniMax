@@ -105,7 +105,7 @@ Place after your save node. Advances the next task by incrementing the loader's 
 
 ```bash
 cd ComfyUI/custom_nodes
-git clone https://github.com/HELPMEEADICE/BatchMiniMax.git
+git clone https://github.com/TagirovAlex/BatchMiniMax.git
 ```
 
 No extra dependencies — uses OpenCV (cv2) and PIL which come with ComfyUI.
