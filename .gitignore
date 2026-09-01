@@ -1,6 +1,7 @@
 __pycache__/
 temp/
 AGENTS.md
+OF MINIMAX.json
 *.pyc
 *.pyo
 *.pyd

@@ -4,6 +4,7 @@ import json
 import copy
 import time
 import glob
+import shutil
 import logging
 import subprocess
 import urllib.request
@@ -16,6 +17,41 @@ from PIL import Image
 import folder_paths
 
 logger = logging.getLogger("BatchMiniMax")
+
+# ---------------------------------------------------------------------------
+# Placeholders
+# ---------------------------------------------------------------------------
+# The generated batch workflow points its manual VHS_LoadVideo / LoadImage
+# widgets at fixed placeholder files (clear.mp4 / clear.jpg) so the FIRST run
+# never depends on the batch folder name. Both files live next to this module
+# and are re-created in ComfyUI's input directory on every module load if the
+# input copy is missing.
+
+PLACEHOLDER_FILES = ("clear.jpg", "clear.mp4")
+
+
+def _ensure_placeholders():
+    """Copy placeholder files into ComfyUI's input dir if they are missing."""
+    src_dir = os.path.dirname(os.path.abspath(__file__))
+    try:
+        input_dir = folder_paths.get_input_directory()
+    except Exception:
+        return
+    for name in PLACEHOLDER_FILES:
+        src = os.path.join(src_dir, name)
+        dst = os.path.join(input_dir, name)
+        if not os.path.exists(src):
+            continue
+        if not os.path.exists(dst):
+            try:
+                with open(src, "rb") as fin, open(dst, "wb") as fout:
+                    shutil.copyfileobj(fin, fout)
+                logger.info(f"BatchMiniMax: placeholder '{name}' created in input dir")
+            except Exception as e:
+                logger.warning(f"BatchMiniMax: failed to copy placeholder '{name}': {e}")
+
+
+_ensure_placeholders()
 
 
 # ---------------------------------------------------------------------------
@@ -56,6 +92,86 @@ def _resolve_folder(path):
         return candidate
     # fall back to abspath so the error message reflects the tried cwd path
     return os.path.abspath(path)
+
+
+def _input_relative(path):
+    """Return ``path`` as a ComfyUI ``input``-relative reference.
+
+    VHS_LoadVideo / LoadImage resolve file names against ComfyUI's ``input``
+    directory and support subfolders there (``sub/01.mp4``). If ``path`` lives
+    under the ``input`` root we return the relative path (with forward slashes);
+    otherwise we fall back to the bare basename (matches the input-root case).
+    """
+    p = os.path.abspath(path)
+    base = os.path.abspath(folder_paths.get_input_directory())
+    try:
+        rel = os.path.relpath(p, base)
+    except ValueError:
+        return os.path.basename(p)
+    if rel.startswith(".."):
+        return os.path.basename(p)
+    return rel.replace("\\", "/")
+
+
+def _sync_workflow_widgets(first_video_name, first_ref_name):
+    """Persist the batch's REAL first-task file names into the generated
+    workflow file (nodes 22 / 23), so the manual VHS_LoadVideo / LoadImage
+    widgets are already correct when the workflow is opened or loaded.
+
+    This removes the need for users to manually re-enter a video/image: after
+    the folder has been used once (or was already stored), opening the workflow
+    shows the real first files and the first Run does not abort/requeue.
+    """
+    wf = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                      "workflows", "OF_MINIMAX_batch.json")
+    if not os.path.isfile(wf):
+        return
+    try:
+        with open(wf, encoding="utf-8") as f:
+            data = json.load(f)
+    except Exception:
+        return
+    changed = False
+    for n in data.get("nodes", []):
+        wv = n.get("widgets_values")
+        if n.get("id") == 22 and isinstance(wv, dict) and wv.get("video") != first_video_name:
+            wv["video"] = first_video_name
+            changed = True
+        elif n.get("id") == 23 and isinstance(wv, list) and wv and wv[0] != first_ref_name:
+            wv[0] = first_ref_name
+            changed = True
+    if changed:
+        try:
+            with open(wf, "w", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False)
+        except Exception:
+            pass
+
+
+def _find_ref_image_node_id(graph):
+    """Return the node id (str) of the LoadImage that feeds
+    ``MiniMaxH3ReferenceToVideo``'s ``ref_images.ref_image_0`` in an API prompt.
+
+    In the API prompt the value is a ``[node_id, slot]`` reference. Returns
+    ``None`` when the graph does not contain the relevant node.
+    """
+    for node_id, node_info in graph.items():
+        if not isinstance(node_info, dict):
+            continue
+        ct = node_info.get("class_type", "")
+        inp = node_info.get("inputs", {})
+        if not isinstance(inp, dict):
+            continue
+        if ct == "MiniMaxH3ReferenceToVideo":
+            ref_val = inp.get("ref_images.ref_image_0")
+            if ref_val is None:
+                nested = inp.get("ref_images")
+                if isinstance(nested, dict):
+                    ref_val = nested.get("ref_image_0")
+            if isinstance(ref_val, list) and len(ref_val) >= 1:
+                return str(ref_val[0])
+    return None
+
 
 
 def _images_for_video(video_path, image_exts):
@@ -345,25 +461,33 @@ class BatchMiniMaxLoader:
                 "select_every_nth": ("INT", {"default": 1, "min": 1,
                     "tooltip": "Select every Nth frame"}),
             },
+            "hidden": {
+                "graph": "PROMPT",
+                "unique_id": "UNIQUE_ID",
+            },
         }
 
-    RETURN_TYPES = ("IMAGE", "AUDIO", "IMAGE", "STRING", "STRING", "FLOAT", "INT", "INT")
-    RETURN_NAMES = ("video_frames", "video_audio", "ref_image",
-                    "prompt", "filename", "duration", "task_index", "total_tasks")
+    RETURN_TYPES = ("STRING", "STRING", "FLOAT", "STRING", "STRING", "STRING", "INT", "INT")
+    RETURN_NAMES = ("prompt", "filename", "duration",
+                    "video_name", "ref_image_name", "next_ref_image_name",
+                    "task_index", "total_tasks")
     FUNCTION = "load"
     CATEGORY = "BatchMiniMax"
     DESCRIPTION = ("Scans a folder of videos and their per-video reference images, "
                    "then serves one (video, image) task at a time. A video is run once "
-                   "per reference image. Outputs frames, audio, one reference image "
-                   "(None if absent), a per-video prompt, the video's duration in "
-                   "seconds (for the length-computation node), and flat "
-                   "task_index/total_tasks counters for BatchAutoQueue.")
+                   "per reference image. Outputs a per-video prompt, the output filename, "
+                   "the video's duration in whole seconds (rounded down, from its "
+                   "metadata), the video file name plus the current and next reference "
+                   "image file names (substituted into the manual VHS_LoadVideo / "
+                   "LoadImage nodes), and flat task_index/total_tasks counters for "
+                   "BatchAutoQueue.")
 
     def load(self, folder_path, task_index, fallback_prompt="",
              video_extensions=".mp4,.mov,.avi,.mkv,.webm",
              image_extensions=".png,.jpg,.jpeg,.webp",
              prompt_extensions=".txt,.prompt", force_rate=0,
-             frame_load_cap=0, skip_first_frames=0, select_every_nth=1):
+             frame_load_cap=0, skip_first_frames=0, select_every_nth=1,
+             graph=None, unique_id=None):
 
         v_exts = _parse_ext_csv(video_extensions, VIDEO_EXTENSIONS)
         i_exts = _parse_ext_csv(image_extensions, IMAGE_EXTENSIONS)
@@ -384,41 +508,126 @@ class BatchMiniMaxLoader:
         # Resolve current task
         task = entries[max(0, min(task_index, total - 1))]
 
-        # Load video frames
-        images, fps, total_frames = _load_video_frames(
-            task["video"], force_rate, frame_load_cap, skip_first_frames, select_every_nth)
+        # Keep the generated workflow file's manual widgets pointing at the
+        # REAL first-task files, so opening/loading the workflow afterwards is
+        # correct without any manual (re-)entry of a video/image.
+        try:
+            _sync_workflow_widgets(
+                _input_relative(entries[0]["video"]),
+                _input_relative(entries[0]["image"]) if entries[0]["image"] else "")
+        except Exception:
+            pass
 
-        # Load audio
-        audio = _get_audio(task["video"])
-        if audio is None:
-            audio = {"waveform": torch.zeros(1, 1, 1), "sample_rate": 44100}
-
-        # Actual duration of the source video in seconds
-        duration_src = float(total_frames) / fps if fps > 0 else float(images.shape[0]) / 24.0
-
-        # Snap DOWN to the 17k+5 grid (24 fps) — no invented frames, model takes
-        # the first N frames of the source itself (we do NOT trim frames here).
-        base = max(5, round(duration_src * 24))
-        length_frames = base - ((base - 5) % 17)
-        duration = float(length_frames) / 24.0
-
-        # Load the single reference image for this task
-        ref_image = _load_image_tensor(task["image"]) if task["image"] else None
+        # Actual duration of the source video in seconds, from its metadata,
+        # rounded DOWN to the nearest whole second. This replaces the manual
+        # seconds input of the reference workflow's length node: the model
+        # nodes (VHS_LoadVideo / mini-max) then drive the generation exactly
+        # as they do in the manual pipeline — we only feed the duration.
+        # We read only the metadata (no frame decoding) since the batch does
+        # not carry frames itself — the manual VHS/LoadImage nodes load them
+        # via the file names we substitute.
+        cap = cv2.VideoCapture(task["video"])
+        if cap.isOpened():
+            fps = cap.get(cv2.CAP_PROP_FPS)
+            total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+            cap.release()
+        else:
+            fps = 0
+            total_frames = 0
+            logger.warning(f"BatchMiniMax: could not open {task['video']} for duration")
+        duration_src = float(total_frames) / fps if fps > 0 else 0.0
+        duration = float(int(duration_src))
 
         # Per-video prompt (one per video, not per task)
         prompt, prompt_is_fallback = _find_prompt(task["video"], p_exts, fallback_prompt)
 
         filename = task["out_stem"]
+        video_name = _input_relative(task["video"])
+        ref_image_name = _input_relative(task["image"]) if task["image"] else ""
+
+        # Reference image for the NEXT task (task_index + 1). BatchAutoQueue
+        # substitutes THIS into the LoadImage of the queued prompt, so there is
+        # no off-by-one: the next task's own reference image is pre-loaded.
+        next_task = entries[max(0, min(task_index + 1, total - 1))]
+        next_ref_image_name = (_input_relative(next_task["image"])
+                               if next_task["image"] else "")
 
         logger.info(f"BatchMiniMax: [{task_index + 1}/{total}] "
-                    f"{os.path.basename(task['video'])}"
-                    f" | ref={'yes' if ref_image is not None else 'no'}"
+                    f"{video_name}"
+                    f" | ref={'yes' if ref_image_name else 'no'}"
+                    f" | next_ref={next_ref_image_name!r}"
                     f" | out={filename}"
                     f" | prompt={'file' if not prompt_is_fallback else 'fallback'}"
-                    f" | frames={images.shape[0]}"
                     f" | dur={duration:.2f}s")
 
-        return (images, audio, ref_image, prompt, filename, duration, task_index, total)
+        # --- first-run correctness --------------------------- -------------
+        # The manual VHS_LoadVideo / LoadImage widgets in the workflow file
+        # point at placeholder/stale files (clear.mp4 / clear.jpg) so the very
+        # first run never depends on the folder name. Those nodes have already
+        # re-read the (placeholder) files cheaply by now, but the expensive
+        # MiniMax generation has NOT run yet. If we detect the widgets do NOT
+        # match the current task's real files, we queue a corrected copy of
+        # this prompt (with the real names) and fail fast — so no placeholder
+        # video is ever generated.
+        if graph is not None and isinstance(graph, dict):
+            vhs_node_id = None
+            vhs_widget = None
+            for pnode_id, pnode in graph.items():
+                if not isinstance(pnode, dict):
+                    continue
+                if pnode.get("class_type", "") == "VHS_LoadVideo":
+                    vhs_node_id = str(pnode_id)
+                    pin = pnode.get("inputs", {}) or {}
+                    vhs_widget = pin.get("video")
+                    break
+            ref_node_id = _find_ref_image_node_id(graph)
+            ref_widget = None
+            if ref_node_id is not None:
+                rn = graph.get(ref_node_id)
+                if isinstance(rn, dict):
+                    pin = rn.get("inputs", {}) or {}
+                    ref_widget = pin.get("image")
+
+            def _normp(s):
+                return os.path.normpath(s or "").replace("\\", "/")
+
+            widgets_ok = (vhs_widget is not None
+                          and _normp(vhs_widget) == _normp(video_name)
+                          and _normp(ref_widget) == _normp(ref_image_name))
+            if not widgets_ok and vhs_node_id is not None:
+                modified = copy.deepcopy(graph)
+                for pnode_id, pnode in modified.items():
+                    if not isinstance(pnode, dict):
+                        continue
+                    pin = pnode.get("inputs", {})
+                    if not isinstance(pin, dict):
+                        continue
+                    ct = pnode.get("class_type", "")
+                    if ct == "VHS_LoadVideo":
+                        pin["video"] = video_name
+                    elif ct == "LoadImage" and str(pnode_id) == str(ref_node_id):
+                        pin["image"] = ref_image_name
+                try:
+                    payload = json.dumps({"prompt": modified}).encode("utf-8")
+                    req = urllib.request.Request(
+                        "http://127.0.0.1:8188/prompt",
+                        data=payload,
+                        headers={"Content-Type": "application/json"},
+                        method="POST")
+                    with urllib.request.urlopen(req, timeout=30) as resp:
+                        resp.read()
+                except Exception as e:
+                    raise RuntimeError(
+                        f"BatchMiniMax: could not queue corrected task "
+                        f"{task_index + 1}/{total}: {e}")
+                raise RuntimeError(
+                    "BatchMiniMax: the manual VHS_LoadVideo/LoadImage widgets "
+                    f"pointed at placeholder/stale files. Queued the correct task "
+                    f"({video_name} / {ref_image_name}) and aborted this run "
+                    "before generation. No placeholder video was produced.")
+
+        return (prompt, filename, duration, video_name, ref_image_name,
+                next_ref_image_name, task_index, total)
 
 
 # ---------------------------------------------------------------------------
@@ -443,6 +652,16 @@ class BatchAutoQueue:
                     "tooltip": "Automatically queue the next task"}),
                 "delay_seconds": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 60.0, "step": 0.1,
                     "tooltip": "Delay before queuing next (seconds)"}),
+                "video_name": ("STRING", {"default": "",
+                    "tooltip": "Base filename of the current video, substituted into "
+                               "VHS_LoadVideo in the queued prompt"}),
+                "ref_image_name": ("STRING", {"default": "",
+                    "tooltip": "Base filename of the current reference image, substituted "
+                               "into LoadImage in the queued prompt. Empty = leave untouched"}),
+                "next_ref_image_name": ("STRING", {"default": "",
+                    "tooltip": "Reference image of the NEXT task. Substituted into "
+                               "LoadImage in the queued prompt (off-by-one free). "
+                               "Empty = falls back to ref_image_name"}),
             },
             "hidden": {
                 "prompt": "PROMPT",
@@ -457,12 +676,15 @@ class BatchAutoQueue:
     CATEGORY = "BatchMiniMax"
     DESCRIPTION = ("Auto-queues the next batch task after generation. Connects to "
                    "BatchMiniMaxLoader's task_index/total_tasks and increments "
-                   "task_index in the next prompt so the loader advances to the next "
-                   "(video, image) pair. Connect trigger from your save node so it only "
-                   "runs after the video is saved.")
+                   "task_index in the next prompt, also substituting the next "
+                   "video_name / next_ref_image_name into the manual VHS_LoadVideo / "
+                   "LoadImage widgets, so the loader advances to the next (video, "
+                   "image) pair through the unmodified manual pipeline. Connect "
+                   "trigger from your save node so it only runs after the video is saved.")
 
     def run(self, task_index, total_tasks, trigger=None, auto_next=True, delay_seconds=1.0,
-            prompt=None, unique_id=None):
+            video_name="", ref_image_name="", next_ref_image_name="", prompt=None,
+            unique_id=None):
 
         status = f"[Batch] {task_index + 1}/{total_tasks}"
 
@@ -486,15 +708,62 @@ class BatchAutoQueue:
 
         # Find BatchMiniMaxLoader node and update its task_index
         found = False
+        # The ID of the LoadImage feeding MiniMaxH3ReferenceToVideo's
+        # ref_images.ref_image_0. We substitute the per-task reference image
+        # ONLY into that loader, so an optional background LoadImage
+        # (ref_image_1, toggled by its group bypasser) is never overwritten.
+        ref_image_node_id = None
+        refs_dump = ""
         for node_id, node_info in modified.items():
             if not isinstance(node_info, dict):
                 continue
-            if node_info.get("class_type") == "BatchMiniMaxLoader":
-                inputs = node_info.get("inputs", {})
-                if isinstance(inputs, dict):
-                    inputs["task_index"] = next_index
-                    found = True
-                    break
+            class_type = node_info.get("class_type", "")
+            inputs = node_info.get("inputs", {})
+            if not isinstance(inputs, dict):
+                continue
+            if class_type == "MiniMaxH3ReferenceToVideo":
+                ref_val = inputs.get("ref_images.ref_image_0")
+                # Multi-inputs may be nested under a "ref_images" dict.
+                if ref_val is None:
+                    nested = inputs.get("ref_images")
+                    if isinstance(nested, dict):
+                        ref_val = nested.get("ref_image_0")
+                refs_dump = f"refs_dump={ref_val!r}"
+                # In the API prompt this is a [node_id, slot] reference.
+                if isinstance(ref_val, list) and len(ref_val) >= 1:
+                    ref_image_node_id = str(ref_val[0])
+
+        for node_id, node_info in modified.items():
+            if not isinstance(node_info, dict):
+                continue
+            class_type = node_info.get("class_type", "")
+            inputs = node_info.get("inputs", {})
+            if not isinstance(inputs, dict):
+                continue
+            if class_type == "BatchMiniMaxLoader":
+                inputs["task_index"] = next_index
+                found = True
+            elif class_type == "VHS_LoadVideo" and video_name:
+                # Substitute the current video file into the manual video loader.
+                inputs["video"] = video_name
+            elif (class_type == "LoadImage" and (next_ref_image_name or ref_image_name)
+                  and (ref_image_node_id is None or node_id == ref_image_node_id)):
+                # Substitute the CURRENT task's image into the LoadImage that
+                # feeds ref_image_0 only; background LoadImage stays untouched.
+                # Prefer next_ref_image_name (image of the task being queued)
+                # so the next run already has ITS own reference (no off-by-one).
+                inputs["image"] = next_ref_image_name or ref_image_name
+
+        status += (f" [video={video_name!r} ref={ref_image_name!r} "
+                   f"nextRef={next_ref_image_name!r} refNode={ref_image_node_id!r} "
+                   f"{refs_dump}]")
+        try:
+            with open(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                   "batch_debug.log"), "a", encoding="utf-8") as f:
+                f.write(f"{time.strftime('%H:%M:%S')} task={task_index + 1}/{total_tasks}"
+                        f" next={next_index + 1} {status}\n")
+        except Exception as e:
+            logger.warning(f"BatchAutoQueue: debug log write failed: {e}")
 
         if not found:
             logger.warning("BatchAutoQueue: BatchMiniMaxLoader node not found in prompt")
@@ -534,6 +803,49 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "BatchMiniMaxLoader": "Batch MiniMax Loader",
+    "BatchMiniMaxLoader": "Batch Mini Max Loader",
     "BatchAutoQueue": "Batch Auto Queue",
 }
+
+
+def _sync_stored_folder_widgets():
+    """Import-time convenience: if the generated workflow file already stores a
+    batch ``folder_path``, sync its manual LoadVideo / LoadImage widgets to the
+    real first-task files. Makes reopening the workflow error-free on the very
+    first Run."""
+    wf = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                      "workflows", "OF_MINIMAX_batch.json")
+    if not os.path.isfile(wf):
+        return
+    try:
+        with open(wf, encoding="utf-8") as f:
+            data = json.load(f)
+    except Exception:
+        return
+    folder = ""
+    for n in data.get("nodes", []):
+        if n.get("id") == 200:
+            wv = n.get("widgets_values")
+            if isinstance(wv, list) and len(wv):
+                folder = str(wv[0] or "").strip()
+            elif isinstance(wv, dict):
+                folder = str(wv.get("folder_path") or "").strip()
+            break
+    if not folder:
+        return
+    try:
+        resolved = _resolve_folder(folder)
+        videos = _scan_folder(resolved, VIDEO_EXTENSIONS)
+        if not videos:
+            return
+        entries = _flatten_tasks(_build_tasks(videos, IMAGE_EXTENSIONS))
+        if not entries:
+            return
+        _sync_workflow_widgets(
+            _input_relative(entries[0]["video"]),
+            _input_relative(entries[0]["image"]) if entries[0]["image"] else "")
+    except Exception:
+        pass
+
+
+_sync_stored_folder_widgets()
