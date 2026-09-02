@@ -114,38 +114,57 @@ def _input_relative(path):
 
 
 def _sync_workflow_widgets(first_video_name, first_ref_name):
-    """Persist the batch's REAL first-task file names into the generated
-    workflow file (nodes 22 / 23), so the manual VHS_LoadVideo / LoadImage
+    """Persist the batch's REAL first-task file names into every workflow file
+    (nodes 22 / 23) that contains a manual VHS_LoadVideo / LoadImage, so the
     widgets are already correct when the workflow is opened or loaded.
+
+    No hard-coded workflow file name: this scans all ``*.json`` workflows in
+    ``workflows/`` and next to this module, and updates any that expose the
+    batch loader (id 200 / BatchMiniMaxLoader). This removes the need to
+    manually re-enter a video/image, and works for any workflow file name.
 
     This removes the need for users to manually re-enter a video/image: after
     the folder has been used once (or was already stored), opening the workflow
     shows the real first files and the first Run does not abort/requeue.
     """
-    wf = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                      "workflows", "OF_MINIMAX_batch.json")
-    if not os.path.isfile(wf):
-        return
-    try:
-        with open(wf, encoding="utf-8") as f:
-            data = json.load(f)
-    except Exception:
-        return
-    changed = False
-    for n in data.get("nodes", []):
-        wv = n.get("widgets_values")
-        if n.get("id") == 22 and isinstance(wv, dict) and wv.get("video") != first_video_name:
-            wv["video"] = first_video_name
-            changed = True
-        elif n.get("id") == 23 and isinstance(wv, list) and wv and wv[0] != first_ref_name:
-            wv[0] = first_ref_name
-            changed = True
-    if changed:
+    candidates = []
+    base = os.path.dirname(os.path.abspath(__file__))
+    wf_dir = os.path.join(base, "workflows")
+    if os.path.isdir(wf_dir):
+        for name in os.listdir(wf_dir):
+            if name.lower().endswith(".json"):
+                candidates.append(os.path.join(wf_dir, name))
+    for name in os.listdir(base):
+        if name.lower().endswith(".json"):
+            candidates.append(os.path.join(base, name))
+    for wf in candidates:
+        if not os.path.isfile(wf):
+            continue
         try:
-            with open(wf, "w", encoding="utf-8") as f:
-                json.dump(data, f, ensure_ascii=False)
+            with open(wf, encoding="utf-8") as f:
+                data = json.load(f)
         except Exception:
-            pass
+            continue
+        # Only touch workflows that actually carry the batch loader.
+        if not any(isinstance(n, dict)
+                   and n.get("type") == "BatchMiniMaxLoader"
+                   for n in data.get("nodes", [])):
+            continue
+        changed = False
+        for n in data.get("nodes", []):
+            wv = n.get("widgets_values")
+            if n.get("id") == 22 and isinstance(wv, dict) and wv.get("video") != first_video_name:
+                wv["video"] = first_video_name
+                changed = True
+            elif n.get("id") == 23 and isinstance(wv, list) and wv and wv[0] != first_ref_name:
+                wv[0] = first_ref_name
+                changed = True
+        if changed:
+            try:
+                with open(wf, "w", encoding="utf-8") as f:
+                    json.dump(data, f, ensure_ascii=False)
+            except Exception:
+                pass
 
 
 def _find_ref_image_node_id(graph):
@@ -809,43 +828,59 @@ NODE_DISPLAY_NAME_MAPPINGS = {
 
 
 def _sync_stored_folder_widgets():
-    """Import-time convenience: if the generated workflow file already stores a
-    batch ``folder_path``, sync its manual LoadVideo / LoadImage widgets to the
+    """Import-time convenience: if any workflow file stores a batch
+    ``folder_path``, sync its manual LoadVideo / LoadImage widgets to the
     real first-task files. Makes reopening the workflow error-free on the very
-    first Run."""
-    wf = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                      "workflows", "OF_MINIMAX_batch.json")
-    if not os.path.isfile(wf):
-        return
-    try:
-        with open(wf, encoding="utf-8") as f:
-            data = json.load(f)
-    except Exception:
-        return
-    folder = ""
-    for n in data.get("nodes", []):
-        if n.get("id") == 200:
+    first Run.
+
+    No hard-coded workflow file name: scans all ``*.json`` workflows in
+    ``workflows/`` and next to this module, and uses the first one that
+    carries a populated BatchMiniMaxLoader folder_path.
+    """
+    candidates = []
+    base = os.path.dirname(os.path.abspath(__file__))
+    wf_dir = os.path.join(base, "workflows")
+    if os.path.isdir(wf_dir):
+        for name in os.listdir(wf_dir):
+            if name.lower().endswith(".json"):
+                candidates.append(os.path.join(wf_dir, name))
+    for name in os.listdir(base):
+        if name.lower().endswith(".json"):
+            candidates.append(os.path.join(base, name))
+    for wf in candidates:
+        if not os.path.isfile(wf):
+            continue
+        try:
+            with open(wf, encoding="utf-8") as f:
+                data = json.load(f)
+        except Exception:
+            continue
+        folder = ""
+        for n in data.get("nodes", []):
+            if not (isinstance(n, dict) and n.get("type") == "BatchMiniMaxLoader"):
+                continue
             wv = n.get("widgets_values")
             if isinstance(wv, list) and len(wv):
                 folder = str(wv[0] or "").strip()
             elif isinstance(wv, dict):
                 folder = str(wv.get("folder_path") or "").strip()
             break
-    if not folder:
-        return
-    try:
-        resolved = _resolve_folder(folder)
-        videos = _scan_folder(resolved, VIDEO_EXTENSIONS)
-        if not videos:
+        if not folder:
+            continue
+        try:
+            resolved = _resolve_folder(folder)
+            videos = _scan_folder(resolved, VIDEO_EXTENSIONS)
+            if not videos:
+                continue
+            entries = _flatten_tasks(_build_tasks(videos, IMAGE_EXTENSIONS))
+            if not entries:
+                continue
+            _sync_workflow_widgets(
+                _input_relative(entries[0]["video"]),
+                _input_relative(entries[0]["image"]) if entries[0]["image"] else "")
             return
-        entries = _flatten_tasks(_build_tasks(videos, IMAGE_EXTENSIONS))
-        if not entries:
-            return
-        _sync_workflow_widgets(
-            _input_relative(entries[0]["video"]),
-            _input_relative(entries[0]["image"]) if entries[0]["image"] else "")
-    except Exception:
-        pass
+        except Exception:
+            continue
 
 
 _sync_stored_folder_widgets()

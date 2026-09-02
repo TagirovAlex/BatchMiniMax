@@ -38,6 +38,25 @@ Custom nodes for [ComfyUI](https://github.com/comfyanonymous/ComfyUI) that add b
 - **Поддерживает ролики разной длины.** Из метаданных каждого ролика берётся его реальная длительность и **округляется вниз до целых секунд** (ролик 9,0 с → `9`). Это целое число подставляется в узел расчёта длины воркфлоу (в ту же ноду, куда при ручном прогоне вводились секунды) — точно как в ручном режиме. Сетку кадров считает сам узел MiniMax.
 - **Качество не теряется.** Пакетные ноды **сами не грузят видео и картинки в генерацию** — они подставляют имена файлов в ручные `VHS_LoadVideo` / `LoadImage`, поэтому в генерацию попадают кадры, закодированные проверенным ручным пайплайном (без артефактов, которые возникали при прямой подаче кадров).
 - **Первый запуск не зависит от имени папки.** Ручные `VHS_LoadVideo` / `LoadImage` по умолчанию указывают на **заглушки** `clear.mp4` / `clear.jpg`, которые пакет автоматически кладёт в папку `input` при загрузке страницы. Поэтому можно свободно переименовывать папку батча — первый прогон не упадёт, а со второго задания `BatchAutoQueue` начнёт подставлять реальные файлы.
+- **Не привязан к имени воркфлоу.** Синхронизация реальных имён файлов применяется к **любому** воркфлоу, в котором есть нода `BatchMiniMaxLoader` (сканируются все `.json` в `workflows/` и рядом с модулем). Поэтому одну и ту же пару батч-нод можно вставить в любой подходящий воркфлоу — имя файла и папки можно менять свободно.
+
+### Готовые воркфлоу (два варианта)
+
+Пакет включает две доработанные версии официального воркфлоу MiniMax H3 «Ref2V / Clothing + BG edit»:
+
+```
+workflows/OF_MINIMAX_batch.json          ← просто батч (исходный пайплайн, VHS_VideoCombine)
+OF MINIMAX batch upscale.json            ← батч + апскейл (2 стадии, латентный 3D-апскейл)
+```
+
+| | Просто батч | Батч + апскейл |
+|---|---|---|
+| Назначение | Прогнать ролики как есть | Прогнать **и апскейлить** результат |
+| Пайплайн | Один `SamplerCustomAdvanced` → VAE-tiled decode → `VHS_VideoCombine` | `SamplerCustomAdvanced` → разделение AV-латента → `MinimaxH3LatentUpscaler3D` → второй `SamplerCustomAdvanced` → `VAEDecode` + `VAEDecodeAudio` → `CreateVideo`/`SaveVideo` |
+| Результат | `01-1.mp4`, `01-2.mp4`, … | `01-1.mp4`, … (через `SaveVideo`) |
+| Триггер `BatchAutoQueue` | `VHS_VideoCombine:Filenames` | `SaveVideo:video` |
+
+В обоих ручные ноды `VHS_LoadVideo` и `LoadImage` сохранены, батч-ноды работают «вокруг» них (подставляют имена файлов и продвигают очередь). Откройте нужный воркфлоу в ComfyUI, укажите `folder_path` (например `batch1`) и запустите.
 
 ### Конвенция имён файлов
 
@@ -110,15 +129,25 @@ git clone https://github.com/TagirovAlex/BatchMiniMax.git
 
 No extra dependencies — uses OpenCV (cv2) and PIL which come with ComfyUI.
 
-## Ready-made workflow
+## Ready-made workflows
 
-A modified version of the official MiniMax H3 "Ref2V / Clothing + BG edit" workflow is included at:
+Modified versions of the official MiniMax H3 "Ref2V / Clothing + BG edit" workflow are included — **two variants**:
 
 ```
-workflows/OF_MINIMAX_batch.json
+workflows/OF_MINIMAX_batch.json          ← plain batch (original pipeline, VHS_VideoCombine)
+OF MINIMAX batch upscale.json            ← batch + latent 3D upscale (2-stage)
 ```
 
-Unlike a "replaces the manual nodes" approach, this batch graph **keeps the manual `VHS_LoadVideo` and `LoadImage` nodes intact**. The two batch nodes sit *around* them: `BatchMiniMaxLoader` computes each task's video/reference-image file names (plus their durations), and `BatchAutoQueue` substitutes those file names into the manual nodes when queuing the next task. Everything else (models, LoRA, sampler, VAE tiling decode, video combine, prompt chain) is untouched. Open it in ComfyUI, set the loader's `folder_path` (e.g. `batch1`), and hit Queue.
+| | Plain batch | Batch + upscale |
+|---|---|---|
+| Purpose | Batch process clips as-is | Batch process **and upscale** the result |
+| Pipeline | Single `SamplerCustomAdvanced` → VAE tiled decode → `VHS_VideoCombine` | `SamplerCustomAdvanced` → separable AV latent → `MinimaxH3LatentUpscaler3D` → 2nd `SamplerCustomAdvanced` → `VAEDecode` + `VAEDecodeAudio` → `CreateVideo`/`SaveVideo` |
+| Output | `01-1.mp4`, `01-2.mp4`, … | `01-1.mp4`, … (via `SaveVideo`) |
+| `BatchAutoQueue` trigger | `VHS_VideoCombine:Filenames` | `SaveVideo:video` |
+
+Both keep the **manual `VHS_LoadVideo` and `LoadImage` nodes intact**. The two batch nodes sit *around* them: `BatchMiniMaxLoader` computes each task's video/reference-image file names (plus their durations), and `BatchAutoQueue` substitutes those file names into the manual nodes when queuing the next task. Everything else (models, LoRA, sampler, prompt chain) is untouched. Open either in ComfyUI, set the loader's `folder_path` (e.g. `batch1`), and hit Queue.
+
+The batch nodes are **not** tied to a specific workflow file name — the auto-sync persists the real first-task file names into **any** workflow that carries a `BatchMiniMaxLoader`, so you can rename folder / workflow freely.
 
 ## Workflow setup
 
