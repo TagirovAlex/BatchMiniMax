@@ -23,6 +23,17 @@ except Exception:
     PromptServer = None
     _HAS_PROMPT_SERVER = False
 
+_DEBUG_LOG = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                          "batch_handler.log")
+
+
+def _dbglog(msg):
+    try:
+        with open(_DEBUG_LOG, "a", encoding="utf-8") as f:
+            f.write(f"{time.strftime('%Y-%m-%d %H:%M:%S')} {msg}\n")
+    except Exception:
+        pass
+
 logger = logging.getLogger("BatchMiniMax")
 
 # ---------------------------------------------------------------------------
@@ -770,14 +781,27 @@ def _patch_batch_prompt(json_data):
 
     Works purely from the BatchMiniMaxLoader's own ``folder_path`` and
     ``task_index`` inputs in the prompt, so the node is fully self-contained.
+
+    NOTE: ``add_on_prompt_handler`` passes a wrapper dict with keys
+    ``client_id`` / ``prompt`` / ``extra_data``; the actual node graph is under
+    ``json_data["prompt"]``.
     """
     if not isinstance(json_data, dict):
         return json_data
+    if isinstance(json_data.get("prompt"), dict) and \
+            any(isinstance(v, dict) and v.get("class_type")
+                for v in json_data["prompt"].values()):
+        graph = json_data["prompt"]
+    else:
+        graph = json_data
+
+    _dbglog(f"on_prompt called, graph keys={list(graph.keys())[:6]}")
+
     try:
         loader_id = None
         folder = ""
         task_index = 0
-        for node_id, node in json_data.items():
+        for node_id, node in graph.items():
             if not isinstance(node, dict):
                 continue
             if node.get("class_type") != "BatchMiniMaxLoader":
@@ -806,8 +830,8 @@ def _patch_batch_prompt(json_data):
         ref_image_name = (_input_relative(task["image"])
                           if task["image"] else "")
 
-        ref_node_id = _find_ref_image_node_id(json_data)
-        for node_id, node in json_data.items():
+        ref_node_id = _find_ref_image_node_id(graph)
+        for node_id, node in graph.items():
             if not isinstance(node, dict):
                 continue
             inp = node.get("inputs", {})
@@ -820,17 +844,25 @@ def _patch_batch_prompt(json_data):
                   and ref_image_name
                   and (ref_node_id is None or str(node_id) == ref_node_id)):
                 inp["image"] = ref_image_name
-    except Exception:
+        _dbglog(f"patched folder={folder!r} task={task_index} "
+                f"video={video_name!r} ref={ref_image_name!r} refNode={ref_node_id!r}")
+    except Exception as e:
         logger.warning("BatchMiniMax: on_prompt patch failed", exc_info=True)
+        _dbglog(f"patch ERROR: {e}")
     return json_data
 
 
 if _HAS_PROMPT_SERVER and PromptServer is not None:
     try:
         PromptServer.instance.add_on_prompt_handler(_patch_batch_prompt)
-    except Exception:
+        _dbglog("handler REGISTERED (add_on_prompt_handler)")
+    except Exception as e:
+        _dbglog(f"handler REGISTER FAILED: {e}")
         logger.warning("BatchMiniMax: could not register on_prompt_handler",
                        exc_info=True)
+else:
+    _dbglog(f"handler NOT registered (_HAS_PROMPT_SERVER={_HAS_PROMPT_SERVER} "
+            f"PromptServer={PromptServer})")
 
 
 # ---------------------------------------------------------------------------
