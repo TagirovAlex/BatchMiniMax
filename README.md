@@ -39,6 +39,7 @@ Custom nodes for [ComfyUI](https://github.com/comfyanonymous/ComfyUI) that add b
 - **Качество не теряется.** Пакетные ноды **сами не грузят видео и картинки в генерацию** — они подставляют имена файлов в ручные `VHS_LoadVideo` / `LoadImage`, поэтому в генерацию попадают кадры, закодированные проверенным ручным пайплайном (без артефактов, которые возникали при прямой подаче кадров).
 - **Первый запуск всегда с реального ролика.** Перед каждым выполнением пакет через `add_on_prompt_handler` подставляет в исполняемый промпт реальные файлы текущего задания (`video` → `VHS_LoadVideo`, `ref_image` → `LoadImage`). Поэтому даже **первая** задача в очереди берёт правильный исходный ролик и референс, а не заглушку. Работает с любым количеством задач подряд, без потери качества на ранних роликах.
 - **Не привязан к имени воркфлоу и не меняет файлы.** Подстановка выполняется **в памяти** — в сам API-промпт перед исполнением, без записи в файлы воркфлоу на диск. Нода работает автономно в **любом** воркфлоу и **любой** папке: она берёт `folder_path`/`task_index` из собственного входа ноды `BatchMiniMaxLoader` и сама вычисляет нужные имена. Имя файла воркфлоу и имя папки можно менять свободно.
+- **Нет сдвига видео между роликами (v0.5.0).** `BatchAutoQueue` больше **не подставляет** `video` в ручной `VHS_LoadVideo` сам — чтобы не было off-by-one при переходе между роликами (когда в `VHS_LoadVideo` уходило видео предыдущего/неверного ролика). Единственный источник правильного `video`/`image` — живой `on_prompt_handler`, который всегда подставляет файлы **текущей** задачи перед её исполнением. Это исключает «просадку качества» на последующих роликах (артефакты вроде «кусков меха» при переходе `01.mp4` → `02.mp4`).
 
 ### Готовые воркфлоу (два варианта)
 
@@ -107,14 +108,14 @@ Selects one (video, image) task at a time and supplies the **file names** (paths
 
 ### Batch Auto Queue
 
-Place after your save node. Advances the next task by incrementing the loader's `task_index` **and** substituting the next video/reference image file names into the manual `VHS_LoadVideo` / `LoadImage` nodes.
+Place after your save node. Advances the next task by incrementing the loader's `task_index`. It **does not** rewrite the video file itself — the correct per-task video/image file names are injected by the live `on_prompt_handler` (`_patch_batch_prompt`) right before each task runs, so there is no off-by-one / stale video between clips.
 
 | Input | Type | Default | Description |
 |-------|------|---------|-------------|
 | `task_index` | INT | — | From BatchMiniMaxLoader |
 | `total_tasks` | INT | — | From BatchMiniMaxLoader |
 | `trigger` | ANY | — | Connect from your save node (e.g. `VHS_VideoCombine`) so it runs only after generation finishes |
-| `video_name` | STRING | `""` | Current video relative path; substituted into `VHS_LoadVideo.video` |
+| `video_name` | STRING | `""` | Current video relative path. Not substituted into `VHS_LoadVideo` (the live handler owns `video`); kept for reference/trigger wiring |
 | `ref_image_name` | STRING | `""` | Current reference image relative path; fallback image source |
 | `next_ref_image_name` | STRING | `""` | **Next** task's reference image; substituted into the `LoadImage` feeding `ref_image_0` (background `LoadImage` is left untouched). Falls back to `ref_image_name` when empty |
 | `auto_next` | BOOLEAN | `True` | Enable auto-queue |
@@ -178,7 +179,7 @@ BatchMiniMaxLoader:task_index ──→ BatchAutoQueue:task_index
 BatchMiniMaxLoader:total_tasks ──→ BatchAutoQueue:total_tasks
 ```
 
-`BatchMiniMaxLoader` does **not** feed `MiniMaxH3ReferenceToVideo` directly. The manual `VHS_LoadVideo` (video) and `LoadImage` (outfit reference) remain connected to it. For each task, `BatchAutoQueue` rewrites the `video` / `image` widgets of those manual nodes to the current task's files (paths relative to `input`), using the **next** task's reference image (`next_ref_image_name`) so there is no off-by-one, and `MiniMaxH3ReferenceToVideo` decodes them through the exact same code path as the manual single-file workflow — preserving quality. The optional background `LoadImage` (`ref_image_1`) is left untouched: its group bypasser toggles it (empty = no background, filled = same background for all tasks).
+`BatchMiniMaxLoader` does **not** feed `MiniMaxH3ReferenceToVideo` directly. The manual `VHS_LoadVideo` (video) and `LoadImage` (outfit reference) remain connected to it. For each task, the live `on_prompt_handler` (`_patch_batch_prompt`) rewrites the `video` / `image` widgets of those manual nodes to the current task's files (paths relative to `input`) right before execution — the **same** source of truth for every task, including the very first, so there is no off-by-one or stale video when the clip changes. `MiniMaxH3ReferenceToVideo` decodes them through the exact same code path as the manual single-file workflow — preserving quality. The optional background `LoadImage` (`ref_image_1`) is left untouched: its group bypasser toggles it (empty = no background, filled = same background for all tasks).
 
 > **First run / live patching.** The batch nodes inject the real task file names into the **executing API prompt** via a `add_on_prompt_handler`, right before the manual `VHS_LoadVideo` / `LoadImage` nodes run. This means the **very first** task in the queue already uses the correct source video and reference image — no placeholder frame is ever generated, and nothing is written to the workflow file on disk. The node is fully self-contained: it derives `folder_path` / `task_index` from its own loader node, so it works in **any** workflow under **any** folder name.
 
@@ -235,7 +236,7 @@ So the workflow blocks stay as the default prompt for clips without a `.txt` fil
 3. It emits the per-video `prompt`, the save `filename` stem, `duration`, and the relative paths `video_name` / `ref_image_name` / **`next_ref_image_name`** (from ComfyUI's `input` root, e.g. `batch1/01.mp4`, `batch1/01-2.jpg`), plus `task_index` / `total_tasks`.
 4. `filename` feeds `VHS_VideoCombine:filename_prefix` so each run saves as `01-1`, `01-2`, … `duration` feeds the length node (`ComfyMathExpression`) — the same node that took the seconds input in the manual workflow — so length is derived per clip (the node then pads to MiniMax's 17k+5 frame grid exactly as the manual workflow does).
 5. **Every run — including the very first — is patched live.** A `add_on_prompt_handler` registered by the module rewrites the manual `VHS_LoadVideo:video` and `LoadImage:image` (the one feeding `ref_image_0`) in the **executing API prompt**, so each task decodes its own real video + reference image. This guarantees correct results from task `0` onward (no placeholder first frame, no quality drop on early clips) and never touches the workflow file.
-6. After the workflow completes and the video is saved, `BatchAutoQueue` increments `task_index`, substitutes `video_name` into the manual `VHS_LoadVideo` widget and `next_ref_image_name` (falling back to `ref_image_name`) into the `LoadImage` that feeds `ref_image_0`, and POSTs the modified prompt to `http://127.0.0.1:8188/prompt`.
+6. After the workflow completes and the video is saved, `BatchAutoQueue` increments `task_index` and POSTs the modified prompt to `http://127.0.0.1:8188/prompt`. It no longer rewrites `VHS_LoadVideo:video` itself (that caused an off-by-one where the *previous* clip's video leaked into the next run); instead the live `on_prompt_handler` supplies the correct `video` / `image` for whatever `task_index` the new prompt carries.
 7. ComfyUI picks up the new prompt and processes the next task — with the video and reference image loaded through the unmodified manual pipeline.
 
 ## Requirements

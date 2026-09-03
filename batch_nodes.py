@@ -719,9 +719,6 @@ class BatchAutoQueue:
             if class_type == "BatchMiniMaxLoader":
                 inputs["task_index"] = next_index
                 found = True
-            elif class_type == "VHS_LoadVideo" and video_name:
-                # Substitute the current video file into the manual video loader.
-                inputs["video"] = video_name
             elif (class_type == "LoadImage" and (next_ref_image_name or ref_image_name)
                   and (ref_image_node_id is None or node_id == ref_image_node_id)):
                 # Substitute the CURRENT task's image into the LoadImage that
