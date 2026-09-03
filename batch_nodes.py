@@ -16,6 +16,13 @@ from PIL import Image
 
 import folder_paths
 
+try:
+    from server import PromptServer
+    _HAS_PROMPT_SERVER = True
+except Exception:
+    PromptServer = None
+    _HAS_PROMPT_SERVER = False
+
 logger = logging.getLogger("BatchMiniMax")
 
 # ---------------------------------------------------------------------------
@@ -579,71 +586,10 @@ class BatchMiniMaxLoader:
                     f" | prompt={'file' if not prompt_is_fallback else 'fallback'}"
                     f" | dur={duration:.2f}s")
 
-        # --- first-run correctness --------------------------- -------------
-        # The manual VHS_LoadVideo / LoadImage widgets in the workflow file
-        # point at placeholder/stale files (clear.mp4 / clear.jpg) so the very
-        # first run never depends on the folder name. Those nodes have already
-        # re-read the (placeholder) files cheaply by now, but the expensive
-        # MiniMax generation has NOT run yet. If we detect the widgets do NOT
-        # match the current task's real files, we queue a corrected copy of
-        # this prompt (with the real names) and fail fast — so no placeholder
-        # video is ever generated.
-        if graph is not None and isinstance(graph, dict):
-            vhs_node_id = None
-            vhs_widget = None
-            for pnode_id, pnode in graph.items():
-                if not isinstance(pnode, dict):
-                    continue
-                if pnode.get("class_type", "") == "VHS_LoadVideo":
-                    vhs_node_id = str(pnode_id)
-                    pin = pnode.get("inputs", {}) or {}
-                    vhs_widget = pin.get("video")
-                    break
-            ref_node_id = _find_ref_image_node_id(graph)
-            ref_widget = None
-            if ref_node_id is not None:
-                rn = graph.get(ref_node_id)
-                if isinstance(rn, dict):
-                    pin = rn.get("inputs", {}) or {}
-                    ref_widget = pin.get("image")
-
-            def _normp(s):
-                return os.path.normpath(s or "").replace("\\", "/")
-
-            widgets_ok = (vhs_widget is not None
-                          and _normp(vhs_widget) == _normp(video_name)
-                          and _normp(ref_widget) == _normp(ref_image_name))
-            if not widgets_ok and vhs_node_id is not None:
-                modified = copy.deepcopy(graph)
-                for pnode_id, pnode in modified.items():
-                    if not isinstance(pnode, dict):
-                        continue
-                    pin = pnode.get("inputs", {})
-                    if not isinstance(pin, dict):
-                        continue
-                    ct = pnode.get("class_type", "")
-                    if ct == "VHS_LoadVideo":
-                        pin["video"] = video_name
-                    elif ct == "LoadImage" and str(pnode_id) == str(ref_node_id):
-                        pin["image"] = ref_image_name
-                try:
-                    payload = json.dumps({"prompt": modified}).encode("utf-8")
-                    req = urllib.request.Request(
-                        "http://127.0.0.1:8188/prompt",
-                        data=payload,
-                        headers={"Content-Type": "application/json"},
-                        method="POST")
-                    with urllib.request.urlopen(req, timeout=30) as resp:
-                        resp.read()
-                except Exception as e:
-                    raise RuntimeError(
-                        f"BatchMiniMax: could not queue corrected task "
-                        f"{task_index + 1}/{total}: {e}")
-                raise RuntimeError(
-                    "BatchMiniMax: the manual VHS_LoadVideo/LoadImage widgets "
-                    f"pointed at placeholder/stale files. Queued the correct task "
-                    f"({video_name} / {ref_image_name}) and aborted this run "
-                    "before generation. No placeholder video was produced.")
+        # The live API prompt is patched by the on_prompt handler
+        # (_patch_batch_prompt): the manual VHS_LoadVideo / LoadImage nodes
+        # receive the real task files at execution time, so the workflow file
+        # itself never needs to change.
 
         return (prompt, filename, duration, video_name, ref_image_name,
                 next_ref_image_name, task_index, total)
@@ -813,6 +759,81 @@ class BatchAutoQueue:
 
 
 # ---------------------------------------------------------------------------
+# Live prompt patching (workflow-agnostic)
+# ---------------------------------------------------------------------------
+
+
+def _patch_batch_prompt(json_data):
+    """Patch the LIVE API prompt (before execution) so the manual
+    VHS_LoadVideo / LoadImage nodes always receive the real files of the batch
+    task being run - in ANY workflow, without writing anything to disk.
+
+    Works purely from the BatchMiniMaxLoader's own ``folder_path`` and
+    ``task_index`` inputs in the prompt, so the node is fully self-contained.
+    """
+    if not isinstance(json_data, dict):
+        return json_data
+    try:
+        loader_id = None
+        folder = ""
+        task_index = 0
+        for node_id, node in json_data.items():
+            if not isinstance(node, dict):
+                continue
+            if node.get("class_type") != "BatchMiniMaxLoader":
+                continue
+            loader_id = str(node_id)
+            inp = node.get("inputs", {}) or {}
+            folder = str(inp.get("folder_path") or "").strip()
+            try:
+                task_index = int(inp.get("task_index") or 0)
+            except (TypeError, ValueError):
+                task_index = 0
+            break
+        if loader_id is None or not folder:
+            return json_data
+
+        resolved = _resolve_folder(folder)
+        videos = _scan_folder(resolved, VIDEO_EXTENSIONS)
+        if not videos:
+            return json_data
+        entries = _flatten_tasks(_build_tasks(videos, IMAGE_EXTENSIONS))
+        total = len(entries)
+        if total == 0:
+            return json_data
+        task = entries[max(0, min(task_index, total - 1))]
+        video_name = _input_relative(task["video"])
+        ref_image_name = (_input_relative(task["image"])
+                          if task["image"] else "")
+
+        ref_node_id = _find_ref_image_node_id(json_data)
+        for node_id, node in json_data.items():
+            if not isinstance(node, dict):
+                continue
+            inp = node.get("inputs", {})
+            if not isinstance(inp, dict):
+                continue
+            ct = node.get("class_type", "")
+            if ct == "VHS_LoadVideo":
+                inp["video"] = video_name
+            elif (ct == "LoadImage"
+                  and ref_image_name
+                  and (ref_node_id is None or str(node_id) == ref_node_id)):
+                inp["image"] = ref_image_name
+    except Exception:
+        logger.warning("BatchMiniMax: on_prompt patch failed", exc_info=True)
+    return json_data
+
+
+if _HAS_PROMPT_SERVER and PromptServer is not None:
+    try:
+        PromptServer.instance.add_on_prompt_handler(_patch_batch_prompt)
+    except Exception:
+        logger.warning("BatchMiniMax: could not register on_prompt_handler",
+                       exc_info=True)
+
+
+# ---------------------------------------------------------------------------
 # Registration
 # ---------------------------------------------------------------------------
 
@@ -883,4 +904,5 @@ def _sync_stored_folder_widgets():
             continue
 
 
-_sync_stored_folder_widgets()
+# No file-write at import time: the workflow files are never modified. The
+# live API prompt is patched by _patch_batch_prompt instead.
